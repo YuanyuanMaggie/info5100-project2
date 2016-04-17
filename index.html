@@ -1,0 +1,148 @@
+<html>
+  <head>
+    <title>Cornell Graduates Starting Salaries</title>
+    
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="//d3js.org/topojson.v1.min.js"></script>
+    <script src="http://d3js.org/d3.geo.projection.v0.min.js" charset="utf-8"></script>
+
+    <style>
+      body { font-family: "Open Sans"; } 
+      
+      svg.map {
+       border: 1px solid #eee;  
+      }
+
+    </style>
+
+  </head>
+  <body>
+    <div class="jumbotron">
+      <div class="container">
+        <h1>Cornell Graduates Starting Salaries</h1>
+      </div>
+    </div>
+
+    <div class="container">
+      <div id="national-map"></div>
+
+      <script>
+        function draw_map() {
+          
+          //used https://bl.ocks.org/mbostock/4573883 as a reference for how to build the color scheme legend
+          var width = 1140,
+              height = 500;
+              // formatPercent = d3.format(".0%"),
+              // formatNumber = d3.format(".0f");
+
+          var projection = d3.geo.mercator()
+            .center([-98.35,39.50])
+            .scale(750)
+            .translate([width / 2, height / 2]);
+
+          var path = d3.geo.path().projection(projection);
+
+          var map = d3.select("#national-map").append("svg")
+              .attr("class", "map")
+              .attr("width", width)
+              .attr("height", height);
+          
+          var regions;
+          var regionalSalaryData;
+
+          var threshold = d3.scale.threshold()
+            .domain([0, 40000.00, 45000.00, 50000.00, 55000.00, 60000.00])
+            .range(["#ffffff", "#f2f0f7", "#dadaeb", "#9e9ac8", "#807dba", "#6a51a3", "#4a1486"]);
+
+          //for the legend
+          // var x = d3.scale.linear()
+          //     .domain([0, 50])
+          //     .range([0, 300]);
+
+          // var xAxis = d3.svg.axis()
+          //     .scale(x)
+          //     .orient("bottom")
+          //     .tickSize(13)
+          //     .tickValues(threshold.domain())
+          //     .tickFormat(function(d) { return d === .5 ? formatPercent(d) : formatNumber(d); });
+
+          d3.json("regions.json", function(error, shapes) {
+            if (error) return console.warn(error);
+
+            regions = topojson.feature(shapes,shapes.objects.regions).features;
+
+            // console.log(regions);
+
+            var regionPaths = map.append("g");
+            regionPaths.selectAll("path").data(regions).enter()
+              .append("path")
+              .attr("d", path)
+              .style("stroke-width", ".5")
+              .style("stroke", "#ccc");
+
+            d3.csv("RegionalStartingSalaries.csv", function (error, rows) {
+              if (error) {console.log(error);}
+              
+              // d3 map function -- takes an array and returns a hash
+              regionalSalaryData = d3.map(rows, function (region) { return region.Region; });
+
+              console.log(regionalSalaryData);
+              
+              regionPaths.selectAll("path")
+                .style("fill", function (region) {
+
+                // country is the geometry
+                console.log(region.properties.name);
+                var regionalData = regionalSalaryData.get(region.properties.name);
+
+                console.log(regionalData);
+
+                console.log(regionalData['2015']);
+                // .style("fill", "url(#circles-1)")
+                // if(! regionData) { return "url(#smalldot)";}
+                return threshold(regionalData['2015']);
+
+              });
+        
+            });
+
+            //for the legend
+            // var legend = map.append("g")
+            //   .attr("class", "key")
+            //   .attr("transform", "translate(" + (width - 380) + "," + (height - 50) + ")");
+
+            // legend.selectAll("rect")
+            //   .data(threshold.range().map(function(color) {
+            //       var d = threshold.invertExtent(color);
+            //       if (d[0] == null) d[0] = x.domain()[0];
+            //       if (d[1] == null) d[1] = x.domain()[1];
+            //       return d;
+            //     }))
+            //   .enter().append("rect")
+            //     .attr("height", 8)
+            //     .attr("x", function(d) { return x(d[0]); })
+            //     .attr("width", function(d) { return x(d[1]) - x(d[0]); })
+            //     .style("fill", function(d) { return threshold(d[0]); });
+
+            // legend.call(xAxis).append("text")
+            //     .attr("class", "caption")
+            //     .attr("y", -6)
+            //     .text("Starting Salaries");
+
+          });
+
+        }
+
+        draw_map();
+
+      </script>
+    </div>
+
+  </body>
+</html>
