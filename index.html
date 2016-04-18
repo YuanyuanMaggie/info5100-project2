@@ -6,143 +6,537 @@
     
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"> -->
+
+    <!-- <link rel="stylesheet" href="colorbrewer.css"> -->
 
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="//d3js.org/topojson.v1.min.js"></script>
     <script src="http://d3js.org/d3.geo.projection.v0.min.js" charset="utf-8"></script>
+    <script
+        src="https://code.jquery.com/jquery-1.12.3.min.js"
+        integrity="sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ="
+        crossorigin="anonymous">
+    </script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+    <script src="colorbrewer.min.js"></script>
 
     <style>
       body { font-family: "Open Sans"; } 
+
+      .row {
+        margin-top: 10px;
+      }
+
+      svg {
+        border: 1px solid #eee; 
+      }
+
+      /* https://bootstrapbay.com/blog/bootstrap-button-styles/ */
+      .btn {
+          padding: 10px 10px;
+          border: 0 none;
+          font-weight: 700;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+      }
+       
+      .btn:focus, .btn:active:focus, .btn.active:focus {
+          outline: 0 none;
+      }
+       
+      .btn-primary {
+          background: #0099cc;
+          color: #ffffff;
+          box-shadow: 0 3px 0 0 #007299;
+      }
+       
+      .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
+          background: #007299;
+          box-shadow: 0 3px 0 0 #007299;
+      }
+
+      .axis {
+        font-size: .8em;
+      }
+      .axis path,
+      .axis line {
+        fill: none;
+        stroke: #ccc;
+        stroke-width: .5;
+        shape-rendering: crispEdges;
+      }
       
-      svg.map {
-       border: 1px solid #eee;  
+      .x.axis .tick text {
+        width: 5px;
+      }
+
+      .line {
+        fill: none;
+        stroke: steelblue; /* default color */
+        stroke-width: 6px;
+        stroke-opacity: .5;
+      }
+
+      path.slice{
+        stroke-width:2px;
+      }
+
+      polyline{
+        opacity: .3;
+        stroke: black;
+        stroke-width: 2px;
+        fill: none;
+      }
+
+      .labels text, .label {
+        font-size: .8em;
       }
 
     </style>
 
   </head>
   <body>
-    <div class="jumbotron">
+    <!-- <div class="jumbotron">
       <div class="container">
         <h1>Cornell Graduates Starting Salaries</h1>
       </div>
     </div>
+ -->
 
     <div class="container">
-      <div id="national-map"></div>
+      <div class="row">
 
-      <script>
-        function draw_map() {
-          
-          //used https://bl.ocks.org/mbostock/4573883 as a reference for how to build the color scheme legend
-          var width = 1140,
-              height = 500;
-              // formatPercent = d3.format(".0%"),
-              // formatNumber = d3.format(".0f");
+        <div class="text-center">
 
-          var projection = d3.geo.mercator()
-            .center([-98.35,39.50])
-            .scale(750)
-            .translate([width / 2, height / 2]);
+          <form>
+          <div class="btn-group btn-group-xs" data-toggle="buttons">
+            <label class="btn btn-primary">
+              <input type="radio" name="year" value="2001" autocomplete="off"> 2001
+            </label>
+            <label class="btn btn-primary">
+              <input type="radio" name="year" value="2002" autocomplete="off"> 2002
+            </label>
+            <label class="btn btn-primary">
+              <input type="radio" name="year" value="2003" autocomplete="off"> 2003
+            </label>
+            <label class="btn btn-primary">
+              <input type="radio" name="year" value="2004" autocomplete="off"> 2004
+            </label>
+            <label class="btn btn-primary">
+              <input type="radio" name="year" value="2005" autocomplete="off"> 2005
+            </label>
+            <label class="btn btn-primary">
+              <input type="radio" name="year" value="2006" autocomplete="off"> 2006
+            </label>
+            <label class="btn btn-primary">
+              <input type="radio" name="year" value="2007" autocomplete="off"> 2007
+            </label>
+            <label class="btn btn-primary">
+              <input type="radio" name="year" value="2008" autocomplete="off"> 2008
+            </label>
+            <label class="btn btn-primary">
+              <input type="radio" name="year" value="2009" autocomplete="off"> 2009
+            </label>
+            <label class="btn btn-primary">
+              <input type="radio" name="year" value="2010" autocomplete="off"> 2010
+            </label>
+            <label class="btn btn-primary">
+              <input type="radio" name="year" value="2011" autocomplete="off"> 2011
+            </label>
+            <label class="btn btn-primary">
+              <input type="radio" name="year" value="2012" autocomplete="off"> 2012
+            </label>
+            <label class="btn btn-primary">
+              <input type="radio" name="year" value="2013" autocomplete="off"> 2013
+            </label>
+            <label class="btn btn-primary">
+              <input type="radio" name="year" value="2014" autocomplete="off" disabled> 2014
+            </label>
+            <label class="btn btn-primary active">
+              <input type="radio" name="year" value="2015" autocomplete="off" checked> 2015
+            </label>
 
-          var path = d3.geo.path().projection(projection);
+          </div>
+          </form>
+        </div>
 
-          var map = d3.select("#national-map").append("svg")
-              .attr("class", "map")
-              .attr("width", width)
-              .attr("height", height);
-          
-          var regions;
-          var regionalSalaryData;
+      </div>
+      <div class="row">
+        <div class="col-lg-5">
+          <div id="bar"></div>
+          <div id="donut"></div>
+        </div>
+        <div class="col-lg-7">
+          <div id="map"></div>
+          <div id="timeline"></div>
+        </div>
+      </div>
+      
+    </div>
 
-          var threshold = d3.scale.threshold()
-            .domain([0, 40000.00, 45000.00, 50000.00, 55000.00, 60000.00])
-            .range(["#ffffff", "#f2f0f7", "#dadaeb", "#9e9ac8", "#807dba", "#6a51a3", "#4a1486"]);
+    <script>
 
-          //for the legend
-          // var x = d3.scale.linear()
-          //     .domain([0, 50])
-          //     .range([0, 300]);
 
-          // var xAxis = d3.svg.axis()
-          //     .scale(x)
-          //     .orient("bottom")
-          //     .tickSize(13)
-          //     .tickValues(threshold.domain())
-          //     .tickFormat(function(d) { return d === .5 ? formatPercent(d) : formatNumber(d); });
 
-          d3.json("regions.json", function(error, shapes) {
-            if (error) return console.warn(error);
+      function drawMap() {
+      
+        var width = 680,
+            height = 400;
+            formatNumber = d3.format(".0f");
 
-            regions = topojson.feature(shapes,shapes.objects.regions).features;
+        var projection = d3.geo.mercator()
+          .center([-96.35,39.50])
+          .scale(600)
+          .translate([width / 2, height / 2]);
 
-            // console.log(regions);
+        var path = d3.geo.path().projection(projection);
 
-            var regionPaths = map.append("g");
-            regionPaths.selectAll("path").data(regions).enter()
-              .append("path")
-              .attr("d", path)
-              .style("stroke-width", ".5")
-              .style("stroke", "#ccc");
+        var map = d3.select("#map").append("svg")
+            .attr("class", "map")
+            .attr("width", width)
+            .attr("height", height);
+        
+        var regions;
+        var regionalSalaryData;
 
-            d3.csv("RegionalStartingSalaries.csv", function (error, rows) {
-              if (error) {console.log(error);}
-              
-              // d3 map function -- takes an array and returns a hash
-              regionalSalaryData = d3.map(rows, function (region) { return region.Region; });
+        //TODO: build legend
 
-              console.log(regionalSalaryData);
+        d3.json("states_w_regions.topojson", function(error, shapes) {
+          if (error) return console.warn(error);
+
+          var colorScale = colorbrewer.Greens[9];
+          var domain = 'Average Starting Salary';
+          $('#legend').html = "Legend";
+
+          var color = d3.scale.quantize()
+            .domain([30000,75000])
+            .range(colorScale);
+
+          regions = topojson.feature(shapes,shapes.objects.states_w_regions).features;
+
+          var regionPaths = map.append("g");
+          regionPaths.selectAll("path").data(regions).enter()
+            .append("path")
+            .attr("d", path)
+            .style("stroke-width", ".5")
+            .style("stroke", "#ccc");
+
+          d3.csv("RegionalStartingSalaries.csv", function (error, rows) {
+            if (error) {console.log(error);}
+            
+            // d3 map function -- takes an array and returns a hash
+            regionalSalaryData = d3.map(rows, function (region) { return region.Region; });
+
+            // can't get this d3 event listener to work
+            // spent a ridiculous amount of time on this too!! :(
+            // d3.selectAll("input").on("change", change);
+            // instead using jquery
+            $('input[type="radio"]').on('click change', updateMap);
+
+            var timeout = setTimeout(function() {
+              d3.select("input[value=\"2015\"]").property("checked", true).each(updateMap);
+            }, 500);
+
+            function updateMap() {
+              clearTimeout(timeout);
+              year = this.value;
+
+              console.log(year);
               
               regionPaths.selectAll("path")
                 .style("fill", function (region) {
 
-                // country is the geometry
-                console.log(region.properties.name);
-                var regionalData = regionalSalaryData.get(region.properties.name);
+                // region is the geometry
+                var regionalData = regionalSalaryData.get(region.properties.region);
 
-                console.log(regionalData);
-
-                console.log(regionalData['2015']);
-                // .style("fill", "url(#circles-1)")
-                // if(! regionData) { return "url(#smalldot)";}
-                return threshold(regionalData['2015']);
-
+                if (! regionalData) { return "#000";}
+                return color(regionalData[year]);
               });
-        
-            });
 
-            //for the legend
-            // var legend = map.append("g")
-            //   .attr("class", "key")
-            //   .attr("transform", "translate(" + (width - 380) + "," + (height - 50) + ")");
-
-            // legend.selectAll("rect")
-            //   .data(threshold.range().map(function(color) {
-            //       var d = threshold.invertExtent(color);
-            //       if (d[0] == null) d[0] = x.domain()[0];
-            //       if (d[1] == null) d[1] = x.domain()[1];
-            //       return d;
-            //     }))
-            //   .enter().append("rect")
-            //     .attr("height", 8)
-            //     .attr("x", function(d) { return x(d[0]); })
-            //     .attr("width", function(d) { return x(d[1]) - x(d[0]); })
-            //     .style("fill", function(d) { return threshold(d[0]); });
-
-            // legend.call(xAxis).append("text")
-            //     .attr("class", "caption")
-            //     .attr("y", -6)
-            //     .text("Starting Salaries");
-
+            }
+      
           });
 
+        });
+      
+      }
+
+
+      //http://bl.ocks.org/dbuezas/9306799
+      //https://bl.ocks.org/mbostock/1346410
+      function drawDonut() {
+        var width = 450,
+            height = 300,
+            radius = Math.min(width, height) / 2;
+
+        var color = d3.scale.category20();
+
+        var pie = d3.layout.pie()
+            .value(function(d) { return d[year]; })
+            .sort(null);
+
+        var arc = d3.svg.arc()
+          .outerRadius(radius * 0.6)
+          .innerRadius(radius * 0.25);
+
+        var outerArc = d3.svg.arc()
+          .innerRadius(radius * 0.9)
+          .outerRadius(radius * 0.9);
+
+        // var svg = d3.select("#donut-chart").append("svg")
+        //     .attr("width", width)
+        //     .attr("height", height)
+        //   .append("g")
+        //     .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+        var svg = d3.select("#donut")
+          .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+          .append("g")
+            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+        svg.append("g")
+          .attr("class", "slices");
+        svg.append("g")
+          .attr("class", "labels");
+        svg.append("g")
+          .attr("class", "lines");
+
+        var key = function(d){ return d.data.Method; };
+
+        d3.csv("FindJobMethod.csv", type, function(error, data) {
+          if (error) throw error;
+
+          var path = svg.datum(data).selectAll("path")
+              .data(pie)
+            .enter().append("path")
+              .attr("fill", function(d, i) { return color(i); })
+              .attr("d", arc)
+              .each(function(d) { this._current = d; }); // store the initial angles
+
+          $('input[type="radio"]').on('click change', updateDonut);
+
+          var timeout = setTimeout(function() {
+            d3.select("input[value=\"2015\"]").property("checked", true).each(updateDonut);
+          }, 500);
+
+          function updateDonut() {
+            clearTimeout(timeout);
+            var year = this.value;
+            
+            pie.value(function(d) { return d[year]; }); // change the value function
+            // path = path.data(pie); // compute the new angles
+            // path.transition().duration(750).attrTween("d", arcTween); // redraw the arcs
+
+            /* ------- PIE SLICES -------*/
+            var slice = svg.select(".slices").selectAll("path.slice")
+              .data(pie(data), key);
+
+            slice.enter()
+              .insert("path")
+              .style("fill", function(d) { return color(d.data.Method); })
+              .attr("class", "slice");
+
+            slice   
+              .transition().duration(1000)
+              .attrTween("d", function(d) {
+                this._current = this._current || d;
+                var interpolate = d3.interpolate(this._current, d);
+                this._current = interpolate(0);
+                return function(t) {
+                  return arc(interpolate(t));
+                };
+              })
+
+            slice.exit()
+              .remove();
+
+            /* ------- TEXT LABELS -------*/
+
+            var text = svg.select(".labels").selectAll("text")
+              .data(pie(data), key);
+
+            text.enter()
+              .append("text")
+              .attr("dy", ".35em")
+              .text(function(d) {
+                console.log(year);
+                console.log(d.data[year])
+                return d.data.Method + d.data[year];
+              });
+            
+            function midAngle(d){
+              return d.startAngle + (d.endAngle - d.startAngle)/2;
+            }
+
+            text.transition().duration(1000)
+              .attrTween("transform", function(d) {
+                this._current = this._current || d;
+                var interpolate = d3.interpolate(this._current, d);
+                this._current = interpolate(0);
+                return function(t) {
+                  var d2 = interpolate(t);
+                  var pos = outerArc.centroid(d2);
+                  pos[0] = radius * (midAngle(d2) < Math.PI ? 1 : -1);
+                  return "translate("+ pos +")";
+                };
+              })
+              .styleTween("text-anchor", function(d){
+                this._current = this._current || d;
+                var interpolate = d3.interpolate(this._current, d);
+                this._current = interpolate(0);
+                return function(t) {
+                  var d2 = interpolate(t);
+                  return midAngle(d2) < Math.PI ? "start":"end";
+                };
+              });
+
+            text.exit()
+              .remove();
+
+            /* ------- SLICE TO TEXT POLYLINES -------*/
+
+            var polyline = svg.select(".lines").selectAll("polyline")
+              .data(pie(data), key);
+            
+            polyline.enter()
+              .append("polyline");
+
+            polyline.transition().duration(1000)
+              .attrTween("points", function(d){
+                this._current = this._current || d;
+                var interpolate = d3.interpolate(this._current, d);
+                this._current = interpolate(0);
+                return function(t) {
+                  var d2 = interpolate(t);
+                  var pos = outerArc.centroid(d2);
+                  pos[0] = radius * 0.95 * (midAngle(d2) < Math.PI ? 1 : -1);
+                  return [arc.centroid(d2), outerArc.centroid(d2), pos];
+                };      
+              });
+            
+            polyline.exit()
+              .remove();
+          }
+        });
+
+
+        function type(d) {
+          d['2010'] = +d['2010'];
+          d['2011'] = +d['2011'];
+          d['2012'] = +d['2012'];
+          d['2013'] = +d['2013'];
+          d['2014'] = +d['2014'];
+          d['2015'] = +d['2015'];
+          return d;
         }
+      
+      }
 
-        draw_map();
 
-      </script>
-    </div>
+      function drawTimeline() {
+        //first chart - timeline Kenya
+        var margin = {top: 30, right: 80, bottom: 70, left: 50},
+            width = 680 - margin.left - margin.right,
+            height = 400 - margin.top - margin.bottom;
+
+        var parseYear = d3.time.format("%Y").parse;
+
+        var x = d3.time.scale().range([0, width]);
+        var y = d3.scale.linear().range([height, 0]);
+
+        var color = d3.scale.category10();
+
+        var xAxis = d3.svg.axis().scale(x)
+            .orient("bottom").ticks(7);
+
+        var yAxis = d3.svg.axis().scale(y)
+            .orient("left").ticks(5).tickFormat(function(d) { return d; });
+
+        var line = d3.svg.line()
+          .x(function(d) { return x(d.year); })
+          .y(function(d) { return y(d.salary); });
+
+        var svg = d3.select("#timeline")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform", 
+                      "translate(" + margin.left + "," + margin.top + ")");
+
+        // Get the data
+        d3.csv("SalariesByCollege.csv", function(error, data) {
+          
+          color.domain(d3.keys(data[0]).filter(function(key) { 
+            if (key !== "Year") {
+              return key; 
+            }
+          }));
+
+          //convert to year format
+          data.forEach(function(d) {
+            d.Year = parseYear(d.Year);
+          });
+
+          var collegeSalaryData = color.domain().map(function(name) {
+            return {
+              name: name,
+              values: data.map(function(d) {
+                return {year: d.Year, salary: +d[name]};
+              })
+            };
+          });
+
+          // console.log(collegeSalaryData);
+
+          // Scale the range of the data
+          x.domain(d3.extent(data, function(d) { return d.Year; }));
+          // y.domain(d3.extent(collegeSalaryData, function(d) { console.log(d.values.salary); return d.values.salary; })); 
+          y.domain([30000,75000]);
+
+          svg.append("g")            // Add the X Axis
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + height + ")")
+              .call(xAxis);
+        
+          svg.append("g")
+              .attr("class", "y axis")
+              .call(yAxis);
+
+          var college = svg.selectAll(".college")
+              .data(collegeSalaryData)
+            .enter().append("g")
+              .attr("class", "college");
+
+          college.append("path")
+              .attr("class", "line")
+              .attr("d", function(d) { return line(d.values); })
+              .style("stroke", function(d) { return color(d.name); });
+
+          college.append("text")
+              .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+              .attr("transform", function(d) { return "translate(" + x(d.value.year) + "," + y(d.value.salary) + ")"; })
+              .attr("x", 3)
+              .attr("dy", ".35em")
+              .attr("class", "label")
+              .text(function(d) { return d.name; });
+        });
+
+      }
+
+      var year = 2015;
+
+      drawMap();
+      drawTimeline();
+      drawDonut();
+
+
+    </script>
 
   </body>
 </html>
