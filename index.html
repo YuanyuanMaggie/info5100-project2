@@ -1,9 +1,9 @@
 <html>
   <head>
     <title>Cornell Graduates Starting Salaries</title>
-    
+
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-    
+
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"> -->
@@ -24,15 +24,15 @@
     <script src="colorbrewer.min.js"></script>
 
     <style>
-      body { font-family: "Open Sans"; } 
+      body { font-family: "Open Sans"; }
 
       .row {
         margin-top: 10px;
       }
-
+/**
       svg {
-        border: 1px solid #eee; 
-      }
+        border: 1px solid #eee;
+      } */
 
       /* https://bootstrapbay.com/blog/bootstrap-button-styles/ */
       .btn {
@@ -42,17 +42,17 @@
           letter-spacing: 1px;
           text-transform: uppercase;
       }
-       
+
       .btn:focus, .btn:active:focus, .btn.active:focus {
           outline: 0 none;
       }
-       
+
       .btn-primary {
           background: #0099cc;
           color: #ffffff;
           box-shadow: 0 3px 0 0 #007299;
       }
-       
+
       .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
           background: #007299;
           box-shadow: 0 3px 0 0 #007299;
@@ -68,7 +68,7 @@
         stroke-width: .5;
         shape-rendering: crispEdges;
       }
-      
+
       .x.axis .tick text {
         width: 5px;
       }
@@ -174,7 +174,7 @@
           <div id="timeline"></div>
         </div>
       </div>
-      
+
     </div>
 
     <script>
@@ -182,7 +182,7 @@
 
 
       function drawMap() {
-      
+
         var width = 680,
             height = 400;
             formatNumber = d3.format(".0f");
@@ -198,7 +198,7 @@
             .attr("class", "map")
             .attr("width", width)
             .attr("height", height);
-        
+
         var regions;
         var regionalSalaryData;
 
@@ -226,7 +226,7 @@
 
           d3.csv("RegionalStartingSalaries.csv", function (error, rows) {
             if (error) {console.log(error);}
-            
+
             // d3 map function -- takes an array and returns a hash
             regionalSalaryData = d3.map(rows, function (region) { return region.Region; });
 
@@ -245,7 +245,7 @@
               year = this.value;
 
               console.log(year);
-              
+
               regionPaths.selectAll("path")
                 .style("fill", function (region) {
 
@@ -257,11 +257,11 @@
               });
 
             }
-      
+
           });
 
         });
-      
+
       }
 
 
@@ -327,7 +327,7 @@
           function updateDonut() {
             clearTimeout(timeout);
             var year = this.value;
-            
+
             pie.value(function(d) { return d[year]; }); // change the value function
             // path = path.data(pie); // compute the new angles
             // path.transition().duration(750).attrTween("d", arcTween); // redraw the arcs
@@ -341,7 +341,7 @@
               .style("fill", function(d) { return color(d.data.Method); })
               .attr("class", "slice");
 
-            slice   
+            slice
               .transition().duration(1000)
               .attrTween("d", function(d) {
                 this._current = this._current || d;
@@ -368,7 +368,7 @@
                 console.log(d.data[year])
                 return d.data.Method + d.data[year];
               });
-            
+
             function midAngle(d){
               return d.startAngle + (d.endAngle - d.startAngle)/2;
             }
@@ -402,7 +402,7 @@
 
             var polyline = svg.select(".lines").selectAll("polyline")
               .data(pie(data), key);
-            
+
             polyline.enter()
               .append("polyline");
 
@@ -416,9 +416,9 @@
                   var pos = outerArc.centroid(d2);
                   pos[0] = radius * 0.95 * (midAngle(d2) < Math.PI ? 1 : -1);
                   return [arc.centroid(d2), outerArc.centroid(d2), pos];
-                };      
+                };
               });
-            
+
             polyline.exit()
               .remove();
           }
@@ -434,7 +434,7 @@
           d['2015'] = +d['2015'];
           return d;
         }
-      
+
       }
 
 
@@ -466,15 +466,15 @@
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
             .append("g")
-                .attr("transform", 
+                .attr("transform",
                       "translate(" + margin.left + "," + margin.top + ")");
 
         // Get the data
         d3.csv("SalariesByCollege.csv", function(error, data) {
-          
-          color.domain(d3.keys(data[0]).filter(function(key) { 
+
+          color.domain(d3.keys(data[0]).filter(function(key) {
             if (key !== "Year") {
-              return key; 
+              return key;
             }
           }));
 
@@ -496,14 +496,14 @@
 
           // Scale the range of the data
           x.domain(d3.extent(data, function(d) { return d.Year; }));
-          // y.domain(d3.extent(collegeSalaryData, function(d) { console.log(d.values.salary); return d.values.salary; })); 
+          // y.domain(d3.extent(collegeSalaryData, function(d) { console.log(d.values.salary); return d.values.salary; }));
           y.domain([30000,75000]);
 
           svg.append("g")            // Add the X Axis
               .attr("class", "x axis")
               .attr("transform", "translate(0," + height + ")")
               .call(xAxis);
-        
+
           svg.append("g")
               .attr("class", "y axis")
               .call(yAxis);
