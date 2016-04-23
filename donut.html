@@ -1,0 +1,171 @@
+      //http://bl.ocks.org/dbuezas/9306799
+      //https://bl.ocks.org/mbostock/1346410
+      function drawDonut() {
+        var width = 450,
+            height = 300,
+            radius = Math.min(width, height) / 2;
+
+        var color = d3.scale.category20();
+
+        var pie = d3.layout.pie()
+            .value(function(d) { return d[year]; })
+            .sort(null);
+
+        var arc = d3.svg.arc()
+          .outerRadius(radius * 0.6)
+          .innerRadius(radius * 0.25);
+
+        var outerArc = d3.svg.arc()
+          .innerRadius(radius * 0.9)
+          .outerRadius(radius * 0.9);
+
+        // var svg = d3.select("#donut-chart").append("svg")
+        //     .attr("width", width)
+        //     .attr("height", height)
+        //   .append("g")
+        //     .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+        var svg = d3.select("#donut")
+          .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+          .append("g")
+            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+        svg.append("g")
+          .attr("class", "slices");
+        svg.append("g")
+          .attr("class", "labels");
+        svg.append("g")
+          .attr("class", "lines");
+
+        var key = function(d){ return d.data.Method; };
+
+        d3.csv("FindJobMethod.csv", type, function(error, data) {
+          if (error) throw error;
+
+          var path = svg.datum(data).selectAll("path")
+              .data(pie)
+            .enter().append("path")
+              .attr("fill", function(d, i) { return color(i); })
+              .attr("d", arc)
+              .each(function(d) { this._current = d; }); // store the initial angles
+
+          $('input[type="radio"]').on('click change', updateDonut);
+
+          var timeout = setTimeout(function() {
+            d3.select("input[value=\"2015\"]").property("checked", true).each(updateDonut);
+          }, 500);
+
+          function updateDonut() {
+            clearTimeout(timeout);
+            var year = this.value;
+            
+            pie.value(function(d) { return d[year]; }); // change the value function
+            // path = path.data(pie); // compute the new angles
+            // path.transition().duration(750).attrTween("d", arcTween); // redraw the arcs
+
+            /* ------- PIE SLICES -------*/
+            var slice = svg.select(".slices").selectAll("path.slice")
+              .data(pie(data), key);
+
+            slice.enter()
+              .insert("path")
+              .style("fill", function(d) { return color(d.data.Method); })
+              .attr("class", "slice");
+
+            slice   
+              .transition().duration(1000)
+              .attrTween("d", function(d) {
+                this._current = this._current || d;
+                var interpolate = d3.interpolate(this._current, d);
+                this._current = interpolate(0);
+                return function(t) {
+                  return arc(interpolate(t));
+                };
+              })
+
+            slice.exit()
+              .remove();
+
+            /* ------- TEXT LABELS -------*/
+
+            var text = svg.select(".labels").selectAll("text")
+              .data(pie(data), key);
+
+            text.enter()
+              .append("text")
+              .attr("dy", ".35em")
+              .text(function(d) {
+                console.log(year);
+                console.log(d.data[year])
+                return d.data.Method + d.data[year];
+              });
+            
+            function midAngle(d){
+              return d.startAngle + (d.endAngle - d.startAngle)/2;
+            }
+
+            text.transition().duration(1000)
+              .attrTween("transform", function(d) {
+                this._current = this._current || d;
+                var interpolate = d3.interpolate(this._current, d);
+                this._current = interpolate(0);
+                return function(t) {
+                  var d2 = interpolate(t);
+                  var pos = outerArc.centroid(d2);
+                  pos[0] = radius * (midAngle(d2) < Math.PI ? 1 : -1);
+                  return "translate("+ pos +")";
+                };
+              })
+              .styleTween("text-anchor", function(d){
+                this._current = this._current || d;
+                var interpolate = d3.interpolate(this._current, d);
+                this._current = interpolate(0);
+                return function(t) {
+                  var d2 = interpolate(t);
+                  return midAngle(d2) < Math.PI ? "start":"end";
+                };
+              });
+
+            text.exit()
+              .remove();
+
+            /* ------- SLICE TO TEXT POLYLINES -------*/
+
+            var polyline = svg.select(".lines").selectAll("polyline")
+              .data(pie(data), key);
+            
+            polyline.enter()
+              .append("polyline");
+
+            polyline.transition().duration(1000)
+              .attrTween("points", function(d){
+                this._current = this._current || d;
+                var interpolate = d3.interpolate(this._current, d);
+                this._current = interpolate(0);
+                return function(t) {
+                  var d2 = interpolate(t);
+                  var pos = outerArc.centroid(d2);
+                  pos[0] = radius * 0.95 * (midAngle(d2) < Math.PI ? 1 : -1);
+                  return [arc.centroid(d2), outerArc.centroid(d2), pos];
+                };      
+              });
+            
+            polyline.exit()
+              .remove();
+          }
+        });
+
+
+        function type(d) {
+          d['2010'] = +d['2010'];
+          d['2011'] = +d['2011'];
+          d['2012'] = +d['2012'];
+          d['2013'] = +d['2013'];
+          d['2014'] = +d['2014'];
+          d['2015'] = +d['2015'];
+          return d;
+        }
+      
+      }

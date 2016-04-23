@@ -1,0 +1,275 @@
+<html>
+  <head>
+    <title>Cornell Graduates Starting Salaries</title>
+    
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"> -->
+
+    <!-- <link rel="stylesheet" href="colorbrewer.css"> -->
+
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="//d3js.org/topojson.v1.min.js"></script>
+    <script src="http://d3js.org/d3.geo.projection.v0.min.js" charset="utf-8"></script>
+    <script
+        src="https://code.jquery.com/jquery-1.12.3.min.js"
+        integrity="sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ="
+        crossorigin="anonymous">
+    </script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+    <script src="colorbrewer.min.js"></script>
+
+    <style>
+      body { font-family: "Open Sans"; } 
+
+      .row {
+        margin-top: 10px;
+      }
+
+      svg {
+        /*border: 1px solid #eee; */
+      }
+
+      /* https://bootstrapbay.com/blog/bootstrap-button-styles/ */
+      .btn {
+          padding: 10px 10px;
+          border: 0 none;
+          font-weight: 700;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+      }
+       
+      .btn:focus, .btn:active:focus, .btn.active:focus {
+          outline: 0 none;
+      }
+       
+      .btn-primary {
+          background: #0099cc;
+          color: #ffffff;
+          box-shadow: 0 3px 0 0 #007299;
+      }
+       
+      .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
+          background: #007299;
+          box-shadow: 0 3px 0 0 #007299;
+      }
+
+      rect {
+        fill: #333;
+      }
+
+      .axis {
+        font-size: .8em;
+      }
+      .axis path,
+      .axis line {
+        fill: none;
+        stroke: #ccc;
+        stroke-width: .5;
+        shape-rendering: crispEdges;
+      }
+      
+      .x.axis .tick text {
+        width: 5px;
+      }
+
+      .trendline {
+        fill: none;
+        stroke: steelblue; /* default color */
+        stroke-width: 3px;
+        stroke-opacity: .5;
+      }
+
+      .datapoint {
+        fill: #ccc;
+      }
+
+      path.slice{
+        stroke-width:2px;
+      }
+
+      polyline{
+        opacity: .3;
+        stroke: black;
+        stroke-width: 2px;
+        fill: none;
+      }
+
+      .labels text, .label {
+        font-size: .8em;
+        font-weight: normal;
+      }
+
+      .bold {
+        font-size: 2em;
+        font-weight: bold;
+      }
+
+    </style>
+
+  </head>
+  <body>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8">
+          <div id="timeline"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+
+      function salaryTimeline(el, salaryData) {
+
+        var margin = {top: 30, right: 200, bottom: 30, left: 50},
+            width = 780 - margin.left - margin.right,
+            height = 280 - margin.top - margin.bottom;
+
+        var parseYear = d3.time.format("%Y").parse;
+
+        var x = d3.time.scale().range([0, width]);
+        var y = d3.scale.linear().range([height, 0]);
+
+        var color = d3.scale.category10();
+
+        var xAxis = d3.svg.axis().scale(x)
+            .orient("bottom").ticks(14);
+
+        var yAxis = d3.svg.axis().scale(y)
+            .orient("left").ticks(5).tickFormat(function(d) { return d; });
+
+        var line = d3.svg.line()
+          .x(function(d) { return x(d.year); })
+          .y(function(d) { return y(d.salary); });
+
+        var chart = d3.select("#timeline")
+          .append("svg")
+              .attr("width", width + margin.left + margin.right)
+              .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+              .attr("transform", 
+                    "translate(" + margin.left + "," + margin.top + ")");
+
+        // DATA for salaries by region
+        d3.csv(salaryData, function(error, data) {
+
+          color.domain(d3.keys(data[0]).filter(function(key) { 
+            if (key !== "Year") {
+              return key; 
+            }
+          }));
+
+          //convert to year format
+          data.forEach(function(d) {
+            d.Year = parseYear(d.Year);
+          });
+
+          // Scale the range of the data
+          //TODO: kind of weird i'm building axes here for both charts?
+          x.domain(d3.extent(data, function(d) { return d.Year; }));
+          y.domain([30000,75000]);
+
+          chart.append("g")            
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + height + ")")
+              .call(xAxis);
+            
+          chart.append("g")
+              .attr("class", "y axis")
+              .call(yAxis);
+
+          var salaryDataMapped = color.domain().map(function(name) {
+            return {
+              name: name,
+              values: data.map(function(d) {
+                return {year: d.Year, salary: +d[name]};
+              })
+            };
+          });
+        
+          var trendLine = chart.selectAll(".trend")
+              .data(salaryDataMapped)
+            .enter().append("g")
+              .attr("class", "trend");
+
+          //trend line
+          trendLine.append("path")
+              .attr("class", "trendline")
+              .attr("d", function(d) { return line(d.values); })
+              .style("stroke", function(d) { return color(d.name); });
+          
+          //label
+          // trendLine.append("text")
+          //     .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+          //     .attr("transform", function(d) { return "translate(" + x(d.value.year) + "," + y(d.value.salary) + ")"; })
+          //     .attr("x", 3)
+          //     .attr("dy", ".35em")
+          //     .attr("class", "label")
+          //     .style("fill", function(d) { return color(d.name); })
+          //     .text(function(d) { return d.name; });
+
+          // add legend   
+          var legend = chart.append("g")
+            .attr("class", "legend")
+                //.attr("x", w - 65)
+                //.attr("y", 50)
+            .attr("height", 100)
+            .attr("width", 100)
+            .attr('transform', 'translate(-20,50)')    
+              
+            
+            legend.selectAll('rect')
+              .data(salaryDataMapped)
+              .enter()
+              .append("rect")
+              .attr("x", width + margin.left)
+              .attr("y", function(d, i){ console.log(i); return i * 20;})
+              .attr("width", 8)
+              .attr("height", 8)
+              .style("fill", function(d) { return color(d.name); });
+              
+            legend.selectAll('text')
+              .data(salaryDataMapped)
+              .enter()
+              .append("text")
+              .attr("class", "label")
+              .attr("x", width + margin.left + 10)
+              .attr("y", function(d, i){ return i * 20 + 8;})
+            .style("fill", function(d) { return color(d.name); })
+              .text(function(d) { return d.name; });
+
+        }); //end of csv data join/mapping
+
+        // $('input[type="radio"]').on('click change', highlightYear);
+
+        // function highlightYear() {
+        //   // clearTimeout(timeout);
+        //   year = this.value;
+
+        //   $('.x.axis text:contains("' + year + '")').addClass('bold');
+
+        //   chart.append("rect")
+        //     .attr("x", x('2010'))
+        //     .attr("y", y(0))
+        //     .attr("width", 20)
+        //     .attr("height", 100);
+
+        // }
+
+      }
+
+      var year = 2015;
+
+      //draw maps and charts
+      // salaryMap();
+      salaryTimeline('#timeline', 'salariesByRegion');
+      salaryTimeline('#timeline', 'salariesByCollege');
+
+    </script>
+  </body>
+</html>
