@@ -6,14 +6,13 @@
     
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
-    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"> -->
-
-    <!-- <link rel="stylesheet" href="colorbrewer.css"> -->
-
+    <link rel="stylesheet" href="site.css">
+    
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="//d3js.org/topojson.v1.min.js"></script>
     <script src="http://d3js.org/d3.geo.projection.v0.min.js" charset="utf-8"></script>
-    <script src="https://d3js.org/d3-queue.v2.min.js"></script>
+    <script src="https://d3js.org/d3-queue.v1.min.js"></script>
+
     <script
         src="https://code.jquery.com/jquery-1.12.3.min.js"
         integrity="sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ="
@@ -23,124 +22,6 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
     <script src="colorbrewer.min.js"></script>
-
-    <style>
-      body { font-family: "Open Sans"; } 
-
-      .row {
-        margin-top: 10px;
-      }
-
-      svg {
-        /*border: 1px solid #eee; */
-      }
-
-      /* https://bootstrapbay.com/blog/bootstrap-button-styles/ */
-      .btn {
-          padding: 10px 10px;
-          border: 0 none;
-          font-weight: 700;
-          letter-spacing: 1px;
-          text-transform: uppercase;
-      }
-       
-      .btn:focus, .btn:active:focus, .btn.active:focus {
-          outline: 0 none;
-      }
-       
-      .btn-primary {
-          background: #0099cc;
-          color: #ffffff;
-          box-shadow: 0 3px 0 0 #007299;
-      }
-       
-      .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
-          background: #007299;
-          box-shadow: 0 3px 0 0 #007299;
-      }
-
-      rect {
-        fill: #333;
-      }
-
-      .axis {
-        font-size: .8em;
-      }
-      .axis path,
-      .axis line {
-        fill: none;
-        stroke: #ccc;
-        stroke-width: .5;
-        shape-rendering: crispEdges;
-      }
-      
-      .x.axis .tick text {
-        width: 5px;
-      }
-
-      .trendline {
-        fill: none;
-        stroke: steelblue; /* default color */
-        stroke-width: 3px;
-        stroke-opacity: .5;
-      }
-
-      .datapoint {
-        fill: #ccc;
-      }
-
-      path.slice{
-        stroke-width:2px;
-      }
-
-      polyline{
-        opacity: .3;
-        stroke: black;
-        stroke-width: 2px;
-        fill: none;
-      }
-
-      .labels text, .label {
-        font-size: .8em;
-        font-weight: normal;
-      }
-
-      .bold {
-        font-size: 2em;
-        font-weight: bold;
-      }
-
-      .state:hover {
-        fill: #666;
-      }
-      .hidden {
-          display: none;
-      }
-      div.tooltip {
-          color: #222;
-          background-color: #fff;
-          padding: .5em;
-          text-shadow: #f5f5f5 0 1px 0;
-          border-radius: 2px;
-          opacity: 0.9;
-          position: absolute;
-      }
-
-      #legend {
-          padding: 1.5em 0 0 1.5em;
-      }
-
-      li.key {
-          border-top-width: 15px;
-          border-top-style: solid;
-          font-size: .75em;
-          width: 10%;
-          padding-left: 0;
-          padding-right: 0;
-      }
-
-
-    </style>
 
   </head>
   <body>
@@ -152,118 +33,87 @@
     </div>
     -->
 
-    <div>
-  <!-- http://thenewcode.com/757/Playing-With-The-HTML5-range-Slider-Input -->
-      <label for="slider">Year</label>
-      <input type="range" min="2001" max="2014" value="2014" id="slider" step="1" >
-      <output for="slider" id="year">2014</output>
-    </div>
-
-
     <div class="container">
       <div class="row">
-
-        <div class="text-center">
-
-          <form>
-          <div class="btn-group btn-group-xs" data-toggle="buttons">
-            <label class="btn btn-primary">
-              <input type="radio" name="year" value="2001" autocomplete="off"> 2001
-            </label>
-            <label class="btn btn-primary">
-              <input type="radio" name="year" value="2002" autocomplete="off"> 2002
-            </label>
-            <label class="btn btn-primary">
-              <input type="radio" name="year" value="2003" autocomplete="off"> 2003
-            </label>
-            <label class="btn btn-primary">
-              <input type="radio" name="year" value="2004" autocomplete="off"> 2004
-            </label>
-            <label class="btn btn-primary">
-              <input type="radio" name="year" value="2005" autocomplete="off"> 2005
-            </label>
-            <label class="btn btn-primary">
-              <input type="radio" name="year" value="2006" autocomplete="off"> 2006
-            </label>
-            <label class="btn btn-primary">
-              <input type="radio" name="year" value="2007" autocomplete="off"> 2007
-            </label>
-            <label class="btn btn-primary">
-              <input type="radio" name="year" value="2008" autocomplete="off"> 2008
-            </label>
-            <label class="btn btn-primary">
-              <input type="radio" name="year" value="2009" autocomplete="off"> 2009
-            </label>
-            <label class="btn btn-primary">
-              <input type="radio" name="year" value="2010" autocomplete="off"> 2010
-            </label>
-            <label class="btn btn-primary">
-              <input type="radio" name="year" value="2011" autocomplete="off"> 2011
-            </label>
-            <label class="btn btn-primary">
-              <input type="radio" name="year" value="2012" autocomplete="off"> 2012
-            </label>
-            <label class="btn btn-primary">
-              <input type="radio" name="year" value="2013" autocomplete="off"> 2013
-            </label>
-            <label class="btn btn-primary">
-              <input type="radio" name="year" value="2014" autocomplete="off" disabled> 2014
-            </label>
-            <label class="btn btn-primary active">
-              <input type="radio" name="year" value="2015" autocomplete="off" checked> 2015
-            </label>
-
-          </div>
-          </form>
-        </div>
-
-      </div>
-      <div class="row">
-        <div class="col-lg-4">
-          <div id="mapStartSalary"></div>
-          <div id="mapMeanSalary"></div>
-        </div>
-        <div class="col-lg-4">
-          <div id="showDetail"></div>
-        </div>
-        <div class="col-lg-4">
-          <div id="mapMeanIncome"></div>
-          <div id="mapCostOfLiving"></div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-12">
+        <div class="col-lg-8">
+          <div id="maps"></div>
           <div id="legend"></div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-8">
-          <div id="timelineCollege"></div>
-        </div>
         <div class="col-lg-4">
-          <!-- Placeholder for college detail -->
+          
+          <div class="text-center">
+            <div class="btn-group" data-toggle="buttons">
+              <label class="btn btn-default active">
+                <input type="radio" id="radio-focus" name="focus" value="state" autocomplete="off" checked> State
+              </label>
+              <label class="btn btn-default">
+                <input type="radio" id="radio-focus" name="focus" value="region" autocomplete="off"> Region
+              </label>
+            </div>
+          </div>
+
+          <div class="text-center">
+            <!-- http://thenewcode.com/757/Playing-With-The-HTML5-range-Slider-Input -->
+            <label for="slider">Year</label>
+            <input type="range" min="2001" max="2014" value="2014" id="slider-year" step="1" >
+          </div>
+      
+          <div id="details">
+            <h3>
+              <span id="focus"></span>
+              <span id="year" class="pull-right">2014</span>
+            </h3>
+            <ul class="data-details"></ul>
+          </div>
+
         </div>
       </div>
-      
     </div>
 
     <script>
 
-    // var vis = (function(d3) {
-    //     var geojson;
-    //     queue()
-    //         .defer(d3.json, 'ger-states.json')
-    //         .defer(d3.json, 'data.json')
-    //         .await(visualize);
+    var maps = 
+      [
+        {
+          id: 'Cornell', 
+          focus: 'region', 
+          type: 'salary',
+          title: 'Mean Starting Salary of Cornell Graduates'
+        },
+        {
+          id: 'Salary', 
+          focus: 'state', 
+          type: 'salary',
+          title: 'Mean Salary Per Capita'
+        },
+        {
+          id: 'Income', 
+          focus: 'state', 
+          type: 'salary',
+          title: 'Mean Household Income'
+        },
+        {
+          id: 'CostIndex', 
+          focus: 'state', 
+          type: 'cost',
+          title: 'Cost of Living Index'
+        }
+      ];
 
-    // })(d3);
 
+    var vis = (function(d3) {
+        var geojson;
+        queue()
+          .defer(d3.json, 'statesUS.topojson')
+          .defer(d3.csv, 'dataByState.csv')
+          .defer(d3.csv, 'dataByRegion.csv')
+          .await(visualize);
 
-      function drawMap(el, title, data, focus, domain, colorScale) {
-      
         var width = 370,
             height = 250;
-            formatNumber = d3.format(".0f");
+            
+        var formatSalary = d3.format("$,.0f");
+        var formatCost = d3.format(".0f");
 
         var projection = d3.geo.mercator()
           .center([-95.35,39.50])
@@ -272,151 +122,148 @@
 
         var path = d3.geo.path().projection(projection);
 
-        var map = d3.select(el).append("svg")
+        //setup scales and ranges
+        //show legend once for each
+        var salaryColors = createLegend([30000,75000], colorbrewer.Greens[9], 'salary');
+        var costColors = createLegend([50,170], colorbrewer.Oranges[6], 'cost');
+
+        function visualize(error, dataGeo, dataByState, dataByRegion) {
+
+          maps.forEach( function (map)
+          {
+            createMap(map.id, map.title, map.type, dataGeo, dataByState, dataByRegion);
+          });
+
+        }
+
+        function createLegend(domain, colorScale, type) {
+
+          var colors = d3.scale.quantize()
+            .domain(domain)
+            .range(colorScale);
+
+          var legend = d3.select('#legend')
+            .append('ul')
+            .attr('class', 'list-inline');
+
+          var keys = legend.selectAll('li.key')
+              .data(colors.range());
+
+          keys.enter().append('li')
+              .attr('class', 'key')
+              .style('border-top-color', String)
+              .text(function(d) {
+                  // return color.invertExtent(d);
+                  var r = colors.invertExtent(d);
+                  if (type == 'salary') {
+
+                    return formatSalary(r[0]);
+                  } else {
+                    return formatCost(r[0]);
+                  }
+
+              });
+
+          return colors;
+        }
+
+        function createMap(id, title, type, shapes, dataState, dataRegion) {
+
+          var map = d3.select('#maps').append("svg")
             .attr("class", "map")
             .attr("width", width)
             .attr("height", height);
 
-        var tooltip = d3.select('body').append('div')
-            .attr('class', 'hidden tooltip');
+            map.append("text")
+            .attr('class','title')
+            .attr("x", width/2)
+            .attr("y", 30)
+            .attr("text-anchor", "middle")
+            .text(title);
 
-        var geography;
-        var areaData;
+            geography = topojson.feature(shapes,shapes.objects.states_w_regions).features;
 
-        map.append("text")
-          .attr('class','title')
-          .attr("x", width/2)
-          .attr("y", 30)
-          .attr("text-anchor", "middle")
-          .text(title);
+            var geoPaths = map.append("g");
+            geoPaths.selectAll("path").data(geography).enter()
+              .append("path")
+              .attr("d", path)
+              .attr("class", "state");
 
-        var color = d3.scale.quantize()
-            .domain(domain)
-            .range(colorScale);
-
-        var legend = d3.select('#legend')
-            .append('ul')
-            .attr('class', 'list-inline');
-
-        var keys = legend.selectAll('li.key')
-            .data(color.range());
-
-        keys.enter().append('li')
-            .attr('class', 'key')
-            .style('border-top-color', String)
-            .text(function(d) {
-                // return color.invertExtent(d);
-                var r = color.invertExtent(d);
-                return formatNumber(r[0]);
-            });
-
-        //TODO: load this data once, refactor code
-        //TODO: add hover over show detail
-        //TODO: threshold scale instead?  that way the color ranges are at better (specific) start/stop numbers like 40K instead of 42111
-        d3.json("statesUS.topojson", function(error, shapes) {
-          if (error) return console.warn(error);
-
-          geography = topojson.feature(shapes,shapes.objects.states_w_regions).features;
-
-          var geoPaths = map.append("g");
-          geoPaths.selectAll("path").data(geography).enter()
-            .append("path")
-            .attr("d", path)
-            .style("stroke-width", ".5")
-            .style("stroke", "white");
-
-          d3.csv(data, function (error, rows) {
-            if (error) {console.log(error);}
-
-            // d3 map function -- takes an array and returns a hash
-
-            if (focus == 'region') {
-              areaData = d3.map(rows, function (d) { return d.Region; });
+            if (type == 'salary') {
+              var colors = salaryColors;
             } else {
-              areaData = d3.map(rows, function (d) { return d.State; });
+              var colors = costColors;
             }
 
-            // console.log(areaData);
-            // can't get this d3 event listener to work
-            // spent a ridiculous amount of time on this too!! :(
-            // d3.selectAll("input").on("change", change);
-            // instead using jquery
-            $('input[type="radio"]').on('click change', updateMap);
-
-            //event handlers  
             
-
-            //user releases slider - capture value and update display
-            //d3.select("#slider").on("change", updateMap);
-
-            var timeout = setTimeout(function() {
-              d3.select("input[value=\"2014\"]").property("checked", true).each(updateMap);
-            }, 500);
-
-            function updateMap() {
-              clearTimeout(timeout);
-              year = this.value;
+            dataByRegion = d3.map(dataRegion, function (d) { return d.Region; });
+            dataByState = d3.map(dataState, function (d) { return d.State; });
+            
+            function updateMaps() {
+              
+              var year = $('input[type="range"]').val();
+              var focus = $('input[type="radio"]:checked').val();
 
               geoPaths.selectAll("path")
                 .style("fill", function (d) {
 
                 // map data to geography
                 if (focus == 'region') {
-                  var filteredData = areaData.get(d.properties.region);
+                  var filteredData = dataByRegion.get(d.properties.region);
                 } else {
-                  var filteredData = areaData.get(d.properties.name);
+                  var filteredData = dataByState.get(d.properties.name);
                 }
                 
-                console.log(filteredData);
                 if (! filteredData) { return "#fff";}
-                return color(filteredData[year]);
+                return colors(filteredData[id + year]);
               })
-                .attr('class', function(d) {
-                  return 'state ' + d.properties.name;
-              })
-              .on('mousemove', function(d) {
-                  var filteredData = areaData.get(d.properties.name);
-                  var mouse = d3.mouse(map.node()).map(function(d) {
-                      return parseInt(d);
+                .on('mouseover', function(d, i) {
+
+                  d3.select(this.parentNode.appendChild(this)).transition().duration(100)
+                    .style({'stroke-opacity':1,'stroke':'#ccc','stroke-width':'2px'});
+
+                  // map data to geography
+                  if (focus == 'region') {
+                    var filteredData = dataByRegion.get(d.properties.region);
+                    $('#focus').html(d.properties.region);
+                  } else {
+                    var filteredData = dataByState.get(d.properties.name);
+                    $('#focus').html(d.properties.name);
+                  }
+                  
+                  // $('#year').html(year);
+                  var list = '';
+                  maps.forEach(function (map) {
+                    if (map.type == 'salary') {
+                      var dataPoint = formatSalary(filteredData[map.id + year]);
+                    } else {
+                      var dataPoint = formatCost(filteredData[map.id + year]);
+                    }
+                    list += '<li><strong>' + map.title + ': </strong>' + dataPoint + '</li>';
                   });
-                  tooltip.classed('hidden', false)
-                      .attr('style', 'left:' + (mouse[0] + 15) +
-                              'px; top:' + (mouse[1] - 35) + 'px')
-                      // .html(filteredData[year]);
-                      .html('dfdafd');
-              })
-              .on('mouseout', function() {
-                  tooltip.classed('hidden', true);
-              });
-
+                  $('ul.data-details').html(list);
+                })
+                .on('mouseout', function(d) {
+                  d3.select(this.parentNode.appendChild(this)).transition().duration(300)
+                    .style({'stroke-opacity':0.5,'stroke':'#fff','stroke-width':'.5px'});
+                });
             }
-      
-          });
 
-        });
-      
-      }
+            //listeners
+            $('input[type="range"]').on("change", updateMaps);
+            $('input[type="radio"]').on('click change', updateMaps);
 
-    
-      // var year = 2014;
-      var salaryDomain = [30000,70000];
-      var costDomain = [60,170];
+            //initialize
+            updateMaps();
 
-      var salaryColorScale = colorbrewer.Greens[9];
-      var costColorScale = colorbrewer.Oranges[5];
-      //draw maps and charts
-      drawMap('#mapStartSalary', 'Mean Starting Salaries Cornell Graduates', 'salariesByRegionForMap.csv', 'region', salaryDomain, salaryColorScale);
-      drawMap('#mapMeanIncome', 'Mean Income', 'incomeByState.csv', 'state', salaryDomain, salaryColorScale);
-      drawMap('#mapMeanSalary', 'Mean Salaries', 'salariesByState.csv', 'state', salaryDomain, salaryColorScale);
-      drawMap('#mapCostOfLiving', 'Cost of Living', 'costOfLivingByState.csv', 'state', costDomain, costColorScale);
-      // drawMap('#mapCornellGradSalary', 'salariesByRegionForMap.csv');
-      // salaryTimeline('#timeline', 'salariesByRegion');
-      // salaryTimeline('#timeline', 'salariesByCollege');
+          }
+        
 
-      //user moves slider - show current value in output field
-      d3.select("#slider").on("input", function() {
-        document.querySelector('#year').value = this.value;;
-      });
+    })(d3);
+
+    $('input[type="range"]').on("input", function() {
+      $('#year').html(this.value);
+    });
 
     </script>
 
