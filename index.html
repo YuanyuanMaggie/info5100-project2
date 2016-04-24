@@ -1,9 +1,9 @@
 <html>
   <head>
     <title>Cornell Graduates Starting Salaries</title>
-
+    
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-
+    
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"> -->
@@ -13,6 +13,7 @@
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="//d3js.org/topojson.v1.min.js"></script>
     <script src="http://d3js.org/d3.geo.projection.v0.min.js" charset="utf-8"></script>
+    <script src="https://d3js.org/d3-queue.v2.min.js"></script>
     <script
         src="https://code.jquery.com/jquery-1.12.3.min.js"
         integrity="sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ="
@@ -24,15 +25,15 @@
     <script src="colorbrewer.min.js"></script>
 
     <style>
-      body { font-family: "Open Sans"; }
+      body { font-family: "Open Sans"; } 
 
       .row {
         margin-top: 10px;
       }
-/**
+
       svg {
-        border: 1px solid #eee;
-      } */
+        /*border: 1px solid #eee; */
+      }
 
       /* https://bootstrapbay.com/blog/bootstrap-button-styles/ */
       .btn {
@@ -42,20 +43,24 @@
           letter-spacing: 1px;
           text-transform: uppercase;
       }
-
+       
       .btn:focus, .btn:active:focus, .btn.active:focus {
           outline: 0 none;
       }
-
+       
       .btn-primary {
           background: #0099cc;
           color: #ffffff;
           box-shadow: 0 3px 0 0 #007299;
       }
-
+       
       .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
           background: #007299;
           box-shadow: 0 3px 0 0 #007299;
+      }
+
+      rect {
+        fill: #333;
       }
 
       .axis {
@@ -68,16 +73,20 @@
         stroke-width: .5;
         shape-rendering: crispEdges;
       }
-
+      
       .x.axis .tick text {
         width: 5px;
       }
 
-      .line {
+      .trendline {
         fill: none;
         stroke: steelblue; /* default color */
-        stroke-width: 6px;
+        stroke-width: 3px;
         stroke-opacity: .5;
+      }
+
+      .datapoint {
+        fill: #ccc;
       }
 
       path.slice{
@@ -93,18 +102,63 @@
 
       .labels text, .label {
         font-size: .8em;
+        font-weight: normal;
       }
+
+      .bold {
+        font-size: 2em;
+        font-weight: bold;
+      }
+
+      .state:hover {
+        fill: #666;
+      }
+      .hidden {
+          display: none;
+      }
+      div.tooltip {
+          color: #222;
+          background-color: #fff;
+          padding: .5em;
+          text-shadow: #f5f5f5 0 1px 0;
+          border-radius: 2px;
+          opacity: 0.9;
+          position: absolute;
+      }
+
+      #legend {
+          padding: 1.5em 0 0 1.5em;
+      }
+
+      li.key {
+          border-top-width: 15px;
+          border-top-style: solid;
+          font-size: .75em;
+          width: 10%;
+          padding-left: 0;
+          padding-right: 0;
+      }
+
 
     </style>
 
   </head>
   <body>
-    <!-- <div class="jumbotron">
+    <!-- 
+    <div class="jumbotron">
       <div class="container">
         <h1>Cornell Graduates Starting Salaries</h1>
       </div>
     </div>
- -->
+    -->
+
+    <div>
+  <!-- http://thenewcode.com/757/Playing-With-The-HTML5-range-Slider-Input -->
+      <label for="slider">Year</label>
+      <input type="range" min="2001" max="2014" value="2014" id="slider" step="1" >
+      <output for="slider" id="year">2014</output>
+    </div>
+
 
     <div class="container">
       <div class="row">
@@ -165,376 +219,204 @@
 
       </div>
       <div class="row">
-        <div class="col-lg-5">
-          <div id="bar"></div>
-          <div id="donut"></div>
+        <div class="col-lg-4">
+          <div id="mapStartSalary"></div>
+          <div id="mapMeanSalary"></div>
         </div>
-        <div class="col-lg-7">
-          <div id="map"></div>
-          <div id="timeline"></div>
+        <div class="col-lg-4">
+          <div id="showDetail"></div>
+        </div>
+        <div class="col-lg-4">
+          <div id="mapMeanIncome"></div>
+          <div id="mapCostOfLiving"></div>
         </div>
       </div>
-
+      <div class="row">
+        <div class="col-lg-12">
+          <div id="legend"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-8">
+          <div id="timelineCollege"></div>
+        </div>
+        <div class="col-lg-4">
+          <!-- Placeholder for college detail -->
+        </div>
+      </div>
+      
     </div>
 
     <script>
 
+    // var vis = (function(d3) {
+    //     var geojson;
+    //     queue()
+    //         .defer(d3.json, 'ger-states.json')
+    //         .defer(d3.json, 'data.json')
+    //         .await(visualize);
+
+    // })(d3);
 
 
-      function drawMap() {
-
-        var width = 680,
-            height = 400;
+      function drawMap(el, title, data, focus, domain, colorScale) {
+      
+        var width = 370,
+            height = 250;
             formatNumber = d3.format(".0f");
 
         var projection = d3.geo.mercator()
-          .center([-96.35,39.50])
-          .scale(600)
+          .center([-95.35,39.50])
+          .scale(350)
           .translate([width / 2, height / 2]);
 
         var path = d3.geo.path().projection(projection);
 
-        var map = d3.select("#map").append("svg")
+        var map = d3.select(el).append("svg")
             .attr("class", "map")
             .attr("width", width)
             .attr("height", height);
 
-        var regions;
-        var regionalSalaryData;
+        var tooltip = d3.select('body').append('div')
+            .attr('class', 'hidden tooltip');
 
-        //TODO: build legend
+        var geography;
+        var areaData;
 
-        d3.json("states_w_regions.topojson", function(error, shapes) {
-          if (error) return console.warn(error);
+        map.append("text")
+          .attr('class','title')
+          .attr("x", width/2)
+          .attr("y", 30)
+          .attr("text-anchor", "middle")
+          .text(title);
 
-          var colorScale = colorbrewer.Greens[9];
-          var domain = 'Average Starting Salary';
-          $('#legend').html = "Legend";
-
-          var color = d3.scale.quantize()
-            .domain([30000,75000])
+        var color = d3.scale.quantize()
+            .domain(domain)
             .range(colorScale);
 
-          regions = topojson.feature(shapes,shapes.objects.states_w_regions).features;
+        var legend = d3.select('#legend')
+            .append('ul')
+            .attr('class', 'list-inline');
 
-          var regionPaths = map.append("g");
-          regionPaths.selectAll("path").data(regions).enter()
+        var keys = legend.selectAll('li.key')
+            .data(color.range());
+
+        keys.enter().append('li')
+            .attr('class', 'key')
+            .style('border-top-color', String)
+            .text(function(d) {
+                // return color.invertExtent(d);
+                var r = color.invertExtent(d);
+                return formatNumber(r[0]);
+            });
+
+        //TODO: load this data once, refactor code
+        //TODO: add hover over show detail
+        //TODO: threshold scale instead?  that way the color ranges are at better (specific) start/stop numbers like 40K instead of 42111
+        d3.json("statesUS.topojson", function(error, shapes) {
+          if (error) return console.warn(error);
+
+          geography = topojson.feature(shapes,shapes.objects.states_w_regions).features;
+
+          var geoPaths = map.append("g");
+          geoPaths.selectAll("path").data(geography).enter()
             .append("path")
             .attr("d", path)
             .style("stroke-width", ".5")
-            .style("stroke", "#ccc");
+            .style("stroke", "white");
 
-          d3.csv("RegionalStartingSalaries.csv", function (error, rows) {
+          d3.csv(data, function (error, rows) {
             if (error) {console.log(error);}
 
             // d3 map function -- takes an array and returns a hash
-            regionalSalaryData = d3.map(rows, function (region) { return region.Region; });
 
+            if (focus == 'region') {
+              areaData = d3.map(rows, function (d) { return d.Region; });
+            } else {
+              areaData = d3.map(rows, function (d) { return d.State; });
+            }
+
+            // console.log(areaData);
             // can't get this d3 event listener to work
             // spent a ridiculous amount of time on this too!! :(
             // d3.selectAll("input").on("change", change);
             // instead using jquery
             $('input[type="radio"]').on('click change', updateMap);
 
+            //event handlers  
+            
+
+            //user releases slider - capture value and update display
+            //d3.select("#slider").on("change", updateMap);
+
             var timeout = setTimeout(function() {
-              d3.select("input[value=\"2015\"]").property("checked", true).each(updateMap);
+              d3.select("input[value=\"2014\"]").property("checked", true).each(updateMap);
             }, 500);
 
             function updateMap() {
               clearTimeout(timeout);
               year = this.value;
 
-              console.log(year);
+              geoPaths.selectAll("path")
+                .style("fill", function (d) {
 
-              regionPaths.selectAll("path")
-                .style("fill", function (region) {
-
-                // region is the geometry
-                var regionalData = regionalSalaryData.get(region.properties.region);
-
-                if (! regionalData) { return "#000";}
-                return color(regionalData[year]);
+                // map data to geography
+                if (focus == 'region') {
+                  var filteredData = areaData.get(d.properties.region);
+                } else {
+                  var filteredData = areaData.get(d.properties.name);
+                }
+                
+                console.log(filteredData);
+                if (! filteredData) { return "#fff";}
+                return color(filteredData[year]);
+              })
+                .attr('class', function(d) {
+                  return 'state ' + d.properties.name;
+              })
+              .on('mousemove', function(d) {
+                  var filteredData = areaData.get(d.properties.name);
+                  var mouse = d3.mouse(map.node()).map(function(d) {
+                      return parseInt(d);
+                  });
+                  tooltip.classed('hidden', false)
+                      .attr('style', 'left:' + (mouse[0] + 15) +
+                              'px; top:' + (mouse[1] - 35) + 'px')
+                      // .html(filteredData[year]);
+                      .html('dfdafd');
+              })
+              .on('mouseout', function() {
+                  tooltip.classed('hidden', true);
               });
 
             }
-
+      
           });
 
         });
-
+      
       }
 
+    
+      // var year = 2014;
+      var salaryDomain = [30000,70000];
+      var costDomain = [60,170];
 
-      //http://bl.ocks.org/dbuezas/9306799
-      //https://bl.ocks.org/mbostock/1346410
-      function drawDonut() {
-        var width = 450,
-            height = 300,
-            radius = Math.min(width, height) / 2;
+      var salaryColorScale = colorbrewer.Greens[9];
+      var costColorScale = colorbrewer.Oranges[5];
+      //draw maps and charts
+      drawMap('#mapStartSalary', 'Mean Starting Salaries Cornell Graduates', 'salariesByRegionForMap.csv', 'region', salaryDomain, salaryColorScale);
+      drawMap('#mapMeanIncome', 'Mean Income', 'incomeByState.csv', 'state', salaryDomain, salaryColorScale);
+      drawMap('#mapMeanSalary', 'Mean Salaries', 'salariesByState.csv', 'state', salaryDomain, salaryColorScale);
+      drawMap('#mapCostOfLiving', 'Cost of Living', 'costOfLivingByState.csv', 'state', costDomain, costColorScale);
+      // drawMap('#mapCornellGradSalary', 'salariesByRegionForMap.csv');
+      // salaryTimeline('#timeline', 'salariesByRegion');
+      // salaryTimeline('#timeline', 'salariesByCollege');
 
-        var color = d3.scale.category20();
-
-        var pie = d3.layout.pie()
-            .value(function(d) { return d[year]; })
-            .sort(null);
-
-        var arc = d3.svg.arc()
-          .outerRadius(radius * 0.6)
-          .innerRadius(radius * 0.25);
-
-        var outerArc = d3.svg.arc()
-          .innerRadius(radius * 0.9)
-          .outerRadius(radius * 0.9);
-
-        // var svg = d3.select("#donut-chart").append("svg")
-        //     .attr("width", width)
-        //     .attr("height", height)
-        //   .append("g")
-        //     .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-        var svg = d3.select("#donut")
-          .append("svg")
-            .attr("width", width)
-            .attr("height", height)
-          .append("g")
-            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-        svg.append("g")
-          .attr("class", "slices");
-        svg.append("g")
-          .attr("class", "labels");
-        svg.append("g")
-          .attr("class", "lines");
-
-        var key = function(d){ return d.data.Method; };
-
-        d3.csv("FindJobMethod.csv", type, function(error, data) {
-          if (error) throw error;
-
-          var path = svg.datum(data).selectAll("path")
-              .data(pie)
-            .enter().append("path")
-              .attr("fill", function(d, i) { return color(i); })
-              .attr("d", arc)
-              .each(function(d) { this._current = d; }); // store the initial angles
-
-          $('input[type="radio"]').on('click change', updateDonut);
-
-          var timeout = setTimeout(function() {
-            d3.select("input[value=\"2015\"]").property("checked", true).each(updateDonut);
-          }, 500);
-
-          function updateDonut() {
-            clearTimeout(timeout);
-            var year = this.value;
-
-            pie.value(function(d) { return d[year]; }); // change the value function
-            // path = path.data(pie); // compute the new angles
-            // path.transition().duration(750).attrTween("d", arcTween); // redraw the arcs
-
-            /* ------- PIE SLICES -------*/
-            var slice = svg.select(".slices").selectAll("path.slice")
-              .data(pie(data), key);
-
-            slice.enter()
-              .insert("path")
-              .style("fill", function(d) { return color(d.data.Method); })
-              .attr("class", "slice");
-
-            slice
-              .transition().duration(1000)
-              .attrTween("d", function(d) {
-                this._current = this._current || d;
-                var interpolate = d3.interpolate(this._current, d);
-                this._current = interpolate(0);
-                return function(t) {
-                  return arc(interpolate(t));
-                };
-              })
-
-            slice.exit()
-              .remove();
-
-            /* ------- TEXT LABELS -------*/
-
-            var text = svg.select(".labels").selectAll("text")
-              .data(pie(data), key);
-
-            text.enter()
-              .append("text")
-              .attr("dy", ".35em")
-              .text(function(d) {
-                console.log(year);
-                console.log(d.data[year])
-                return d.data.Method + d.data[year];
-              });
-
-            function midAngle(d){
-              return d.startAngle + (d.endAngle - d.startAngle)/2;
-            }
-
-            text.transition().duration(1000)
-              .attrTween("transform", function(d) {
-                this._current = this._current || d;
-                var interpolate = d3.interpolate(this._current, d);
-                this._current = interpolate(0);
-                return function(t) {
-                  var d2 = interpolate(t);
-                  var pos = outerArc.centroid(d2);
-                  pos[0] = radius * (midAngle(d2) < Math.PI ? 1 : -1);
-                  return "translate("+ pos +")";
-                };
-              })
-              .styleTween("text-anchor", function(d){
-                this._current = this._current || d;
-                var interpolate = d3.interpolate(this._current, d);
-                this._current = interpolate(0);
-                return function(t) {
-                  var d2 = interpolate(t);
-                  return midAngle(d2) < Math.PI ? "start":"end";
-                };
-              });
-
-            text.exit()
-              .remove();
-
-            /* ------- SLICE TO TEXT POLYLINES -------*/
-
-            var polyline = svg.select(".lines").selectAll("polyline")
-              .data(pie(data), key);
-
-            polyline.enter()
-              .append("polyline");
-
-            polyline.transition().duration(1000)
-              .attrTween("points", function(d){
-                this._current = this._current || d;
-                var interpolate = d3.interpolate(this._current, d);
-                this._current = interpolate(0);
-                return function(t) {
-                  var d2 = interpolate(t);
-                  var pos = outerArc.centroid(d2);
-                  pos[0] = radius * 0.95 * (midAngle(d2) < Math.PI ? 1 : -1);
-                  return [arc.centroid(d2), outerArc.centroid(d2), pos];
-                };
-              });
-
-            polyline.exit()
-              .remove();
-          }
-        });
-
-
-        function type(d) {
-          d['2010'] = +d['2010'];
-          d['2011'] = +d['2011'];
-          d['2012'] = +d['2012'];
-          d['2013'] = +d['2013'];
-          d['2014'] = +d['2014'];
-          d['2015'] = +d['2015'];
-          return d;
-        }
-
-      }
-
-
-      function drawTimeline() {
-        //first chart - timeline Kenya
-        var margin = {top: 30, right: 80, bottom: 70, left: 50},
-            width = 680 - margin.left - margin.right,
-            height = 400 - margin.top - margin.bottom;
-
-        var parseYear = d3.time.format("%Y").parse;
-
-        var x = d3.time.scale().range([0, width]);
-        var y = d3.scale.linear().range([height, 0]);
-
-        var color = d3.scale.category10();
-
-        var xAxis = d3.svg.axis().scale(x)
-            .orient("bottom").ticks(7);
-
-        var yAxis = d3.svg.axis().scale(y)
-            .orient("left").ticks(5).tickFormat(function(d) { return d; });
-
-        var line = d3.svg.line()
-          .x(function(d) { return x(d.year); })
-          .y(function(d) { return y(d.salary); });
-
-        var svg = d3.select("#timeline")
-            .append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-                .attr("transform",
-                      "translate(" + margin.left + "," + margin.top + ")");
-
-        // Get the data
-        d3.csv("SalariesByCollege.csv", function(error, data) {
-
-          color.domain(d3.keys(data[0]).filter(function(key) {
-            if (key !== "Year") {
-              return key;
-            }
-          }));
-
-          //convert to year format
-          data.forEach(function(d) {
-            d.Year = parseYear(d.Year);
-          });
-
-          var collegeSalaryData = color.domain().map(function(name) {
-            return {
-              name: name,
-              values: data.map(function(d) {
-                return {year: d.Year, salary: +d[name]};
-              })
-            };
-          });
-
-          // console.log(collegeSalaryData);
-
-          // Scale the range of the data
-          x.domain(d3.extent(data, function(d) { return d.Year; }));
-          // y.domain(d3.extent(collegeSalaryData, function(d) { console.log(d.values.salary); return d.values.salary; }));
-          y.domain([30000,75000]);
-
-          svg.append("g")            // Add the X Axis
-              .attr("class", "x axis")
-              .attr("transform", "translate(0," + height + ")")
-              .call(xAxis);
-
-          svg.append("g")
-              .attr("class", "y axis")
-              .call(yAxis);
-
-          var college = svg.selectAll(".college")
-              .data(collegeSalaryData)
-            .enter().append("g")
-              .attr("class", "college");
-
-          college.append("path")
-              .attr("class", "line")
-              .attr("d", function(d) { return line(d.values); })
-              .style("stroke", function(d) { return color(d.name); });
-
-          college.append("text")
-              .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
-              .attr("transform", function(d) { return "translate(" + x(d.value.year) + "," + y(d.value.salary) + ")"; })
-              .attr("x", 3)
-              .attr("dy", ".35em")
-              .attr("class", "label")
-              .text(function(d) { return d.name; });
-        });
-
-      }
-
-      var year = 2015;
-
-      drawMap();
-      drawTimeline();
-      drawDonut();
-
+      //user moves slider - show current value in output field
+      d3.select("#slider").on("input", function() {
+        document.querySelector('#year').value = this.value;;
+      });
 
     </script>
 
