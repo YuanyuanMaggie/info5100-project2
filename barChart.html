@@ -28,7 +28,7 @@
 <body>
 <div class="slider-wrap">
 <label id="slider">Pay Rate : <span id="sliderNum">0.2</span></label>
-<input type="range" min="0.2" max="1" value="0.2" id="slider-load" step="0.01" onchange="changeSlider(this.value)">
+<input type="range" min="0.2" max="1" value="0.2" id="slider-load" step="0.01" onchange="changeSlider()">
 <div id="barchart">
 </div>
 </div>
@@ -39,7 +39,7 @@
   var rate = $('input[type="range"]').val();
   drawBars(year);
 	
-  
+
   function drawBars(year) {
 	   var width = 500;
 	   var height = 500;
@@ -145,7 +145,7 @@
 	 	return Math.ceil(loanYear);
 	 }    
 
-   function changeSlider(value){
+   function changeSlider(){
     rate = $('input[type="range"]').val();
     $("#sliderNum").html(rate);
     drawBars(year);
