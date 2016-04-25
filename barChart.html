@@ -27,15 +27,15 @@
 <script type="text/javascript">
 	drawBars(2012);
 	function drawBars(year) {
-	   var width = 400;
-	   var height = 400;
-	   var padding = 30;
+	   var width = 500;
+	   var height = 500;
+	   var padding = 50;
 
 	   var color = d3.scale.category10();
 	   var SalaryDic = {};
 	   var xBands = d3.scale.ordinal().rangeBands([padding, width-padding], 0.3, 0.1);
 	   var yScale = d3.scale.linear().range([height - padding, padding]);
-	   
+
 	   var xAxis = d3.svg.axis().scale(xBands).orient("bottom");
 
 	   var yAxis = d3.svg.axis().scale(yScale)
@@ -48,16 +48,16 @@
 	   	if(error){
 	   		console.log(error);
 	   	}
-	   	var majors = d3.keys(rows[0]).filter(function(key) { 
+	   	var majors = d3.keys(rows[0]).filter(function(key) {
             if (key !== "Year" && key!=="Tuition") {
-              return key; 
+              return key;
             }
           });
 
 	   	color.domain(majors);
 	   	xBands.domain(majors);
 	  	var rate = 0.25;
-	   	yScale.domain([0,1-72]);
+	   	yScale.domain([0,50]);
 	   	rows.forEach(function(row){
       		var SalariesByCollege = {
       			"AgricultureAndLifeSciences":loanYear(row.Tuition, row.AgricultureAndLifeSciences, rate),
@@ -78,11 +78,11 @@
 	   	selectYearArr.push([d,selectYearLoan[d]]);
 	   })
 
-	   svg.append("g")            
+	   svg.append("g")
               .attr("class", "axis")
-              .attr("transform", "translate(0," + (height-padding) + ")")
+              .attr("transform", "translate(0," + (height-padding + 10) + ")")
               .call(xAxis);
-            
+
        svg.append("g")
               .attr("class", "axis")
               .attr("transform", "translate(" + padding + ","+padding+")")
@@ -93,7 +93,7 @@
             .enter().append("g")
               .attr("class", "bars");
 
-         
+
           loanBar.append("rect")
               .attr("class", "bar")
          	.attr("x",function(d){
@@ -101,20 +101,22 @@
          	.attr("y",function(d){return yScale(d[1])})
          	.attr("width",xBands.rangeBand())
          	.attr("height",function(d){
-         		return  yScale(0)-yScale(d[1])})
+         		return  yScale(0)+yScale(d[1])})
             .style("fill",function(d) {return color(d[0])});
-	      }); 
+	      });
 
-	   	
 
-	     };  
+
+	     };
 
 	 function loanYear(Tuition,salary,percent) {
 
 	 	var temp = (0.0429*Tuition)/(percent*salary);
-	 	var loanYear = Math.log(1-temp)/Math.log(1.0429);
+	 	//var loanYear = -(Math.ln(1-temp)/Math.ln(1.0429));
+		var loanYear = (-Math.log(1-temp))/(Math.log(1+0.0429))
+		console.log(loanYear);
 	 	return loanYear;
-	 }     
+	 }
 </script>
 </body>
 </html>
