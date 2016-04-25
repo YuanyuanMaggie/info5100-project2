@@ -57,7 +57,9 @@ body { font-family: "Open Sans"; }
 #legend {
     padding: 1.5em 0 0 1.5em;
 }
-
+.slider-wrap{
+  width: 50%
+}
 li.key {
     border-top-width: 15px;
     border-top-style: solid;

@@ -3,6 +3,14 @@
 <head>
 	<title>Bar Chart</title>
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+   <link rel="stylesheet" href="site.css">
+   <script
+        src="https://code.jquery.com/jquery-1.12.3.min.js"
+        integrity="sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ="
+        crossorigin="anonymous">
+    </script>
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.6.7/d3-tip.js"></script>
 </head>
 <style type="text/css">
 	.axis {
@@ -11,25 +19,31 @@
       .axis path,
       .axis line {
         fill: none;
-        stroke: #ccc;
+        stroke: #000;
         stroke-width: .5;
         shape-rendering: crispEdges;
       }
 
-      .tick text{
-      	word-wrap: break-word;
-      }
 </style>
 <body>
+<div class="slider-wrap">
+<label id="slider">Pay Rate : <span id="sliderNum">0.2</span></label>
+<input type="range" min="0.2" max="1" value="0.2" id="slider-load" step="0.01" onchange="changeSlider(this.value)">
 <div id="barchart">
+</div>
 </div>
 
 <script type="text/javascript">
-	drawBars(2012);
-	function drawBars(year) {
+	
+  var year = 2014;
+  var rate = $('input[type="range"]').val();
+  drawBars(year);
+	
+  
+  function drawBars(year) {
 	   var width = 500;
 	   var height = 500;
-	   var padding = 50;
+	   var padding = 60;
 
 	   var color = d3.scale.category10();
 	   var SalaryDic = {};
@@ -41,6 +55,7 @@
 	   var yAxis = d3.svg.axis().scale(yScale)
             .orient("left").ticks(5).tickFormat(function(d) { return d; });
 
+    d3.selectAll("svg").remove();
        var svg = d3.select("#barchart").append("svg")
 				.attr("height", height).attr("width", width);
 
@@ -56,8 +71,8 @@
 
 	   	color.domain(majors);
 	   	xBands.domain(majors);
-	  	var rate = 0.25;
-	   	yScale.domain([0,50]);
+	   	yScale.domain([0,70]);
+
 	   	rows.forEach(function(row){
       		var SalariesByCollege = {
       			"AgricultureAndLifeSciences":loanYear(row.Tuition, row.AgricultureAndLifeSciences, rate),
@@ -80,19 +95,26 @@
 
 	   svg.append("g")
               .attr("class", "axis")
-              .attr("transform", "translate(0," + (height-padding + 10) + ")")
+              .attr("transform", "translate(0," + (height-padding) + ")")
               .call(xAxis);
 
        svg.append("g")
               .attr("class", "axis")
-              .attr("transform", "translate(" + padding + ","+padding+")")
+              .attr("transform", "translate(" + padding + ",0)")
               .call(yAxis);
 
 	   var loanBar = svg.selectAll(".bars")
               .data(selectYearArr)
             .enter().append("g")
               .attr("class", "bars");
+      var tip = d3.tip()
+                   .attr('class', 'd3-tip')
+                    .offset([-10, 0])
+                    .html(function(d) {
+                      return "<strong>College :</strong> <span style='color:red'>" + d[0] + "</span><br><strong>Year:</strong> <span style='color:red'>" + d[1] + "</span>";
+                       });
 
+          svg.call(tip);
 
           loanBar.append("rect")
               .attr("class", "bar")
@@ -101,9 +123,15 @@
          	.attr("y",function(d){return yScale(d[1])})
          	.attr("width",xBands.rangeBand())
          	.attr("height",function(d){
-         		return  yScale(0)+yScale(d[1])})
-            .style("fill",function(d) {return color(d[0])});
-	      });
+         		return  yScale(0)-yScale(d[1])})
+            .style("fill",function(d) {return color(d[0])})
+            .on("mouseover",function(d){
+                tip.show(d);
+              })
+              .on("mouseout",function(d){
+                tip.hide(d);
+              });;
+	       });
 
 
 
@@ -114,9 +142,14 @@
 	 	var temp = (0.0429*Tuition)/(percent*salary);
 	 	//var loanYear = -(Math.ln(1-temp)/Math.ln(1.0429));
 		var loanYear = (-Math.log(1-temp))/(Math.log(1+0.0429))
-		console.log(loanYear);
-	 	return loanYear;
-	 }
+	 	return Math.ceil(loanYear);
+	 }    
+
+   function changeSlider(value){
+    rate = $('input[type="range"]').val();
+    $("#sliderNum").html(rate);
+    drawBars(year);
+   }
 </script>
 </body>
 </html>
