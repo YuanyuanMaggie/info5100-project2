@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Cornell Graduates Starting Salaries</title>
+    <title>Cornell Graduates</title>
     
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     
@@ -12,6 +12,7 @@
     <script src="//d3js.org/topojson.v1.min.js"></script>
     <script src="http://d3js.org/d3.geo.projection.v0.min.js" charset="utf-8"></script>
     <script src="https://d3js.org/d3-queue.v1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.6.7/d3-tip.js"></script>
 
     <script
         src="https://code.jquery.com/jquery-1.12.3.min.js"
@@ -34,7 +35,17 @@
     -->
 
     <div class="container">
+
       <div class="row">
+        <div class="col-lg-12">
+          <p>As graduation approaches, every Cornell senior has an important decision to make: which job to pick. With graduation coming up quickly in May, we thought we could take this opportunity to delve deeper into what Cornell students have received as their starting salaries as they step out into the real world. We hope this visualization helps graduating seniors students in their decision making process about potential job opportunities.</p>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-12">
+          <h2>Cornell Graduates - Regional and State Comparisons</h2>
+        </div>
         <div class="col-lg-8">
           <div id="maps"></div>
           <div id="legend"></div>
@@ -59,6 +70,7 @@
           </div>
       
           <div id="details">
+            <span class="placeholder">Hover over state for details</span>
             <h3>
               <span id="focus"></span>
               <span id="year" class="pull-right">2014</span>
@@ -68,6 +80,39 @@
 
         </div>
       </div>
+
+      <div class="row">
+
+        <div class="col-lg-12">
+          <h2>Cornell Graduates - College Comparisons</h2>
+        </div>
+
+        <div class="col-lg-12">
+          <div id="timeline"></div>
+        </div>
+
+          
+        <div id="college-details">
+          <div id="eng">
+            <p>The College of Engineering is a division of Cornell University that was founded in 1870 as the Sibley College of Mechanical Engineering and Mechanic Arts. It is one of four private undergraduate colleges at Cornell that are not statutory colleges.</p>
+            <p><strong>Rank: </strong></p>
+            <p><strong>Enrollment: 4,477 (2010)</strong></p>
+            <p><a href="https://www.engineering.cornell.edu/">learn more</a></p>
+          </div>
+
+          <div id="cals">
+            <p>From the university’s highly-ranked undergraduate business program to innovative teaching, research and outreach in communication, development sociology, landscape architecture, environmental sciences, biological sciences, and other fields, CALS offers a broad spectrum of programs that complement our historic and powerful agricultural roots.</p>
+            <p><a href="https://cals.cornell.edu/">learn more</a></p>
+          </div>
+
+          <div id="che">
+            <p>The mission of the College of Human Ecology is to improve lives by exploring and shaping human connections to natural, social, and built environments.</p>
+            <p>Faculty, students, and staff explore the human dimensions of social and natural sciences, design, nutrition and health, public policy, society, family, community, and other realms-all in pursuit of knowledge to make the world a better place. Using Cornell's far-reaching extension network and the college's translational research methods, we deliver our findings directly to communities and families, ensuring that our work reaches those who need it most.</p>
+            <p><a href="http://www.human.cornell.edu/">learn more</a></p>
+          </div>
+        </div>
+
+      </div>
     </div>
 
     <script>
@@ -76,27 +121,33 @@
       [
         {
           id: 'Cornell', 
-          focus: 'region', 
           type: 'salary',
-          title: 'Mean Starting Salary of Cornell Graduates'
+          title: 'Starting Salary of Cornell Graduates',
+          showMap: true
         },
         {
-          id: 'Salary', 
-          focus: 'state', 
+          id: 'AdjForCost',
           type: 'salary',
-          title: 'Mean Salary Per Capita'
+          title: 'Salary Adjusted by Cost of Living',
+          showMap: false
         },
         {
-          id: 'Income', 
-          focus: 'state', 
+          id: 'Salary',  
           type: 'salary',
-          title: 'Mean Household Income'
+          title: 'Salary Per Capita',
+          showMap: true
         },
         {
-          id: 'CostIndex', 
-          focus: 'state', 
+          id: 'Rent', 
+          type: 'rent',
+          title: 'Housing (Rental) Costs',
+          showMap: true
+        },
+        {
+          id: 'CostIndex',
           type: 'cost',
-          title: 'Cost of Living Index'
+          title: 'Cost of Living Index',
+          showMap: true
         }
       ];
 
@@ -112,8 +163,8 @@
         var width = 370,
             height = 250;
             
-        var formatSalary = d3.format("$,.0f");
-        var formatCost = d3.format(".0f");
+        var formatCurrency = d3.format("$,.0f");
+        var formatIndex = d3.format(".0f");
 
         var projection = d3.geo.mercator()
           .center([-95.35,39.50])
@@ -125,13 +176,16 @@
         //setup scales and ranges
         //show legend once for each
         var salaryColors = createLegend([30000,75000], colorbrewer.Greens[9], 'salary');
-        var costColors = createLegend([50,170], colorbrewer.Oranges[6], 'cost');
+        var costColors = createLegend([50,170], colorbrewer.Purples[6], 'cost');
+        var rentColors = createLegend([500,1500], colorbrewer.Reds[5], 'rent');
 
         function visualize(error, dataGeo, dataByState, dataByRegion) {
 
           maps.forEach( function (map)
           {
-            createMap(map.id, map.title, map.type, dataGeo, dataByState, dataByRegion);
+            if (map.showMap) {
+              createMap(map.id, map.title, map.type, dataGeo, dataByState, dataByRegion);
+            }
           });
 
         }
@@ -155,11 +209,10 @@
               .text(function(d) {
                   // return color.invertExtent(d);
                   var r = colors.invertExtent(d);
-                  if (type == 'salary') {
-
-                    return formatSalary(r[0]);
+                  if (type == 'cost') {
+                    return formatIndex(r[0]);
                   } else {
-                    return formatCost(r[0]);
+                    return formatCurrency(r[0]);
                   }
 
               });
@@ -191,8 +244,10 @@
 
             if (type == 'salary') {
               var colors = salaryColors;
-            } else {
+            } else if (type == 'cost') {
               var colors = costColors;
+            } else {
+              var colors = rentColors;
             }
 
             
@@ -234,12 +289,12 @@
                   // $('#year').html(year);
                   var list = '';
                   maps.forEach(function (map) {
-                    if (map.type == 'salary') {
-                      var dataPoint = formatSalary(filteredData[map.id + year]);
+                    if (map.type == 'cost') {
+                      var dataPoint = formatIndex(filteredData[map.id + year]);
                     } else {
-                      var dataPoint = formatCost(filteredData[map.id + year]);
+                      var dataPoint = formatCurrency(filteredData[map.id + year]);
                     }
-                    list += '<li><strong>' + map.title + ': </strong>' + dataPoint + '</li>';
+                    list += '<li>' + map.title + ': <strong>' + dataPoint + '</strong></li>';
                   });
                   $('ul.data-details').html(list);
                 })
@@ -261,9 +316,196 @@
 
     })(d3);
 
+    //show year as input changes
     $('input[type="range"]').on("input", function() {
       $('#year').html(this.value);
     });
+
+
+    //timeline 
+    salaryTimeline('#timeline', 'salariesByCollege.csv');
+    
+    function salaryTimeline(el, salaryData) {
+      var margin = {top: 30, right: 300, bottom: 30, left: 60},
+          width = 1170 - margin.left - margin.right,
+          height = 400 - margin.top - margin.bottom;
+
+      var formatCurrency = d3.format("$,.0f");
+
+      var parseYear = d3.time.format("%Y").parse;
+
+      var x = d3.time.scale().range([0, width]);
+      var y = d3.scale.log().range([height, 0]);
+
+      var color = d3.scale.category10();
+
+      var xAxis = d3.svg.axis().scale(x)
+          .orient("bottom").ticks(14);
+
+      var yAxis = d3.svg.axis().scale(y)
+          .orient("left").ticks(5).tickFormat(function(d) { return formatCurrency(d); });
+
+      var line = d3.svg.line()
+        .x(function(d) { return x(d.year); })
+        .y(function(d) { return y(d.salary); });
+
+      var chart = d3.select("#timeline")
+        .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+            .attr("transform", 
+                  "translate(" + margin.left + "," + margin.top + ")");
+
+      // DATA for salaries by region
+      d3.csv(salaryData, function(error, data) {
+        color.domain(d3.keys(data[0]).filter(function(key) { 
+          if (key !== "Year") {
+            return key; 
+          }
+        }));
+
+        //convert to year format
+        data.forEach(function(d) {
+          d.Year = parseYear(d.Year);
+        });
+
+        // Scale the range of the data
+        //TODO: kind of weird i'm building axes here for both charts?
+        x.domain(d3.extent(data, function(d) { return d.Year; }));
+        y.domain([30000,200000]);
+
+        chart.append("g")            
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+          
+        chart.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
+
+        var salaryDataMapped = color.domain().map(function(name) {
+          return {
+            name: name,
+            values: data.map(function(d) {
+              return {year: d.Year, salary: +d[name]};
+            })
+          };
+        });
+        
+        
+        var trendLine = chart.selectAll(".trend")
+            .data(salaryDataMapped)
+          .enter().append("g")
+            .attr("class", "trend");
+
+        //trend line
+        trendLine.append("path")
+            .attr("class", "trendline")
+            .attr("id",function(d){
+              var name = d.name.replace(/ +/g, "");
+              return name})
+            .attr("d", function(d) { return line(d.values); })
+            .style("stroke", function(d) { return color(d.name); })
+            ;
+        var salaryDataArr = [];
+        salaryDataMapped.forEach(function(data){
+          var name = data.name;
+          data.values.forEach(function(d){
+            var salary = d.salary;
+            var year = d.year;
+            var salaryItem = {
+              "name": name,
+              "salary":salary,
+              "year":year
+            };
+            salaryDataArr.push(salaryItem);
+          });
+        })
+
+        var trendCircle = chart.selectAll(".trendCircles")
+            .data(salaryDataArr)
+          .enter().append("g")
+            .attr("class", "trendCircles");
+
+        var tip = d3.tip()
+               .attr('class', 'd3-tip')
+                .offset([-10, 0])
+                .html(function(d) {
+                  return "<strong>Salary :</strong> <span style='color:red'>$" + d.salary + "</span><br><strong>College:</strong> <span style='color:red'>" + d.name + "</span>";
+                   });
+
+        chart.call(tip);
+        //trend circle
+        trendCircle.append("circle")
+            .attr("class", "trendCircle")
+            .attr("cx",function(d){return x(d.year)})
+            .attr("cy",function(d){return y(d.salary)})
+            .attr("r",3.5)
+            .attr("opacity",0.5)
+            .style("fill", function(d) { return color(d.name); })
+            .on("mouseover",function(d){
+              d3.select(this).attr("r",8);
+              tip.show(d);
+        })
+            .on("mouseout",function(d){
+              d3.select(this).attr("r",3.5);
+              tip.hide(d);
+            });
+       
+        // add legend   
+        var legend = chart.append("g")
+          .attr("class", "legend")
+          .attr("height", 100)
+          .attr("width", 100)
+          .attr('transform', 'translate(-20,50)')    
+            
+          
+          legend.selectAll('rect')
+            .data(salaryDataMapped)
+            .enter()
+            .append("rect")
+            .attr("id",function(d){
+              var name = d.name.replace(/ +/g, "")+"Rect";
+              return name})
+            .attr("x", width + margin.left)
+            .attr("y", function(d, i){return i * 20;})
+            .attr("width", 8)
+            .attr("height", 8)
+            .style("fill", function(d) { return color(d.name); });
+            
+          legend.selectAll('text')
+            .data(salaryDataMapped)
+            .enter()
+            .append("text")
+            .attr("class", "label")
+            .attr("id",function(d){
+              var name = d.name.replace(/ +/g, "") + "Label";
+              return name})
+            .attr("x", width + margin.left + 10)
+            .attr("y", function(d, i){ return i * 20 + 8;})
+          .style("fill", function(d) { return color(d.name); })
+            .text(function(d) { return d.name; })
+            .on("mouseover",function(data){
+               d3.select(this).style("font-size","1.2em");
+                var name = "#"+data.name.replace(/ +/g, "")
+                var rect = name + "Rect";
+                d3.select(name).style("stroke-width","8px");
+                d3.select(rect).attr("width",10).attr("height",10);
+                $('#college-details').css('display','block');
+            })
+            .on("mouseout",function(data){
+              d3.select(this).style("font-size","0.8em");
+              var name = "#"+data.name.replace(/ +/g, "")
+                var rect = name + "Rect";
+                d3.select(name).style("stroke-width","3px");
+                d3.select(rect).attr("width",8).attr("height",8);
+                $('#college-details').css('display','none');
+            })
+
+        }); 
+
+      }
 
     </script>
 

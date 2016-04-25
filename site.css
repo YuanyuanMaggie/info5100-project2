@@ -1,10 +1,9 @@
 /* styles */
 
-
 body { font-family: "Open Sans"; } 
 
 .row {
-  margin-top: 10px;
+  margin-top: 50px;
 }
 
 /* charts with axes */
@@ -36,16 +35,13 @@ body { font-family: "Open Sans"; }
   stroke: white;
 }
 
-path.slice{
-  stroke-width:2px;
-}
 
-polyline{
+/*polyline{
   opacity: .3;
   stroke: black;
   stroke-width: 2px;
   fill: none;
-}
+}*/
 
 .labels text, .label {
   font-size: .8em;
@@ -55,14 +51,6 @@ polyline{
 .bold {
   font-size: 2em;
   font-weight: bold;
-}
-
-/* tooltip version of hover over on maps */
-.details-panel {
-  text-align: center;
-  width: 100%;
-  padding: 20px;
-  background: #ddd;
 }
 
 /* legends for maps */
@@ -79,6 +67,32 @@ li.key {
     padding-right: 0;
 }
 
+#college-details {
+  display: none;
+}
+
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 10%;
+  height: 50%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+  left:50%;
+  top:95%;
+}
 
 /* input slider */
 /* http://danielstern.ca/range.css/#/ */
