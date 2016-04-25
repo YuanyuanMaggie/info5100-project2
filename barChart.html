@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Bar Chart</title>
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+</head>
+<style type="text/css">
+	.axis {
+        font-size: .8em;
+      }
+      .axis path,
+      .axis line {
+        fill: none;
+        stroke: #ccc;
+        stroke-width: .5;
+        shape-rendering: crispEdges;
+      }
+
+      .tick text{
+      	word-wrap: break-word;
+      }
+</style>
+<body>
+<div id="barchart">
+</div>
+
+<script type="text/javascript">
+	drawBars(2012);
+	function drawBars(year) {
+	   var width = 400;
+	   var height = 400;
+	   var padding = 30;
+
+	   var color = d3.scale.category10();
+	   var SalaryDic = {};
+	   var xBands = d3.scale.ordinal().rangeBands([padding, width-padding], 0.3, 0.1);
+	   var yScale = d3.scale.linear().range([height - padding, padding]);
+	   
+	   var xAxis = d3.svg.axis().scale(xBands).orient("bottom");
+
+	   var yAxis = d3.svg.axis().scale(yScale)
+            .orient("left").ticks(5).tickFormat(function(d) { return d; });
+
+       var svg = d3.select("#barchart").append("svg")
+				.attr("height", height).attr("width", width);
+
+	   d3.csv("SalariesandTuitionByCollege.csv",function(error,rows){
+	   	if(error){
+	   		console.log(error);
+	   	}
+	   	var majors = d3.keys(rows[0]).filter(function(key) { 
+            if (key !== "Year" && key!=="Tuition") {
+              return key; 
+            }
+          });
+
+	   	color.domain(majors);
+	   	xBands.domain(majors);
+	  	var rate = 0.25;
+	   	yScale.domain([0,1-72]);
+	   	rows.forEach(function(row){
+      		var SalariesByCollege = {
+      			"AgricultureAndLifeSciences":loanYear(row.Tuition, row.AgricultureAndLifeSciences, rate),
+      			"ArchitechtureArtAndPlanning": loanYear(row.Tuition, row.ArchitechtureArtAndPlanning,rate),
+      			"ArtsAndSciences": loanYear(row.Tuition, row.ArtsAndSciences,rate),
+      			"Engineering": loanYear(row.Tuition, row.Engineering,rate),
+      			"Hotel": loanYear(row.Tuition, row.Hotel,rate),
+      			"HumanEcology": loanYear(row.Tuition, row.HumanEcology,rate),
+      			"IndustrialAndLaborRelations": loanYear(row.Tuition, row.IndustrialAndLaborRelations,rate),
+      			"Tuition": row.Tuition
+	              }
+	        // console.log(loanYear(row.Tuition, row.AgricultureAndLifeSciences),0.25);
+	         SalaryDic[row.Year]=SalariesByCollege;
+	     } );
+	   var selectYearLoan = SalaryDic[year];
+	   var selectYearArr = [];
+	   majors.forEach(function(d){
+	   	selectYearArr.push([d,selectYearLoan[d]]);
+	   })
+
+	   svg.append("g")            
+              .attr("class", "axis")
+              .attr("transform", "translate(0," + (height-padding) + ")")
+              .call(xAxis);
+            
+       svg.append("g")
+              .attr("class", "axis")
+              .attr("transform", "translate(" + padding + ","+padding+")")
+              .call(yAxis);
+
+	   var loanBar = svg.selectAll(".bars")
+              .data(selectYearArr)
+            .enter().append("g")
+              .attr("class", "bars");
+
+         
+          loanBar.append("rect")
+              .attr("class", "bar")
+         	.attr("x",function(d){
+         		return xBands(d[0])})
+         	.attr("y",function(d){return yScale(d[1])})
+         	.attr("width",xBands.rangeBand())
+         	.attr("height",function(d){
+         		return  yScale(0)-yScale(d[1])})
+            .style("fill",function(d) {return color(d[0])});
+	      }); 
+
+	   	
+
+	     };  
+
+	 function loanYear(Tuition,salary,percent) {
+
+	 	var temp = (0.0429*Tuition)/(percent*salary);
+	 	var loanYear = Math.log(1-temp)/Math.log(1.0429);
+	 	return loanYear;
+	 }     
+</script>
+</body>
+</html>
