@@ -1,13 +1,13 @@
 <html>
   <head>
     <title>Cornell Graduates</title>
-    
+
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-    
+
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
     <link rel="stylesheet" href="site.css">
-    
+
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="//d3js.org/topojson.v1.min.js"></script>
     <script src="http://d3js.org/d3.geo.projection.v0.min.js" charset="utf-8"></script>
@@ -30,7 +30,7 @@
 
       <div class="row">
         <div class="col-lg-12">
-          <h2>Cornell Graduates - Regional and State Comparisons</h2>
+          <h2>Cornell Graduates - Regional and State Starting Salary Comparison</h2>
         </div>
       </div>
       <div class="row">
@@ -58,7 +58,7 @@
         </div>
         <div class="col-lg-4">
           <div id="details" class="jumbotron">
-            <p id="intro">As graduation approaches, every Cornell senior has an important decision to make: which job to pick. With graduation coming up quickly in May, we thought we could take this opportunity to delve deeper into what Cornell students have received as their starting salaries as they step out into the real world. We hope this visualization helps graduating seniors students in their decision making process about potential job opportunities.</p>
+            <p id="intro">As graduation approaches, every Cornell senior has an important decision to make: which job to pick. With graduation coming up quickly in May, we thought we could take this opportunity to delve deeper into what Cornell students have received as their starting salaries as they stepped out into the real world. We hope this visualization helps graduating seniors students in their decision making process about potential job opportunities.</p>
             <h3 class='no-top-margin'>
               <span id="focus"></span>
               <span id="focus-year" class="pull-right"></span>
@@ -79,13 +79,13 @@
         </div>
         <div class="col-lg-3">
             <input type="hidden" id="year-loan" value='2014'></input>
-            <label id="slider">Loan Paid as Percent of Salary  : <span id="percent">20%</span></label>
+            <label id="slider"> Years it'll take to pay back a loan taken to fund a 4 year Cornell degree if one pays <span id="percent">20%</span> of starting salary:</label>
             <input type="range" min="0.2" max="1" value="0.2" id="slider-percent" step="0.01" >
           <div id="barchart"></div>
         </div>
 
       </div>
-    
+
     </div>
 
     <script>
@@ -105,10 +105,10 @@
     });
 
 
-    var maps = 
+    var maps =
       [
         {
-          id: 'Cornell', 
+          id: 'Cornell',
           type: 'salary',
           title: 'Starting Salary of Cornell Graduates',
           showMap: true
@@ -120,13 +120,13 @@
           showMap: false
         },
         {
-          id: 'Salary',  
+          id: 'Salary',
           type: 'salary',
           title: 'Salary Per Capita',
           showMap: true
         },
         {
-          id: 'Rent', 
+          id: 'Rent',
           type: 'rent',
           title: 'Housing (Rental) Costs',
           showMap: true
@@ -241,7 +241,7 @@
           var dataByState = d3.map(dataState, function (d) { return d.State; });
 
           function updateMaps() {
-            
+
             var year = $('input[id="slider-year"]').val();
             var focus = $('input[type="radio"]:checked').val();
 
@@ -254,7 +254,7 @@
               } else {
                 var filteredData = dataByState.get(d.properties.name);
               }
-      
+
               if (! filteredData) { return "#e2e2e2";}
               return colors(filteredData[id + year]);
             })
@@ -271,12 +271,12 @@
                 } else {
                   var filteredData = dataByState.get(d.properties.name);
                   $('#focus').html(d.properties.name);
-  
+
                   var highlight = d3.select(this).attr('data-state');
                   d3.selectAll('[data-state="' + highlight + '"]')
                     .style({'fill-opacity':.5});
-                }                  
-                
+                }
+
                 // $('#year').html(year);
                 var list = '';
                 maps.forEach(function (map) {
@@ -316,12 +316,12 @@
             updateMaps();
 
           }
-        
+
 
     })(d3);
 
     function createTimeline() {
-      
+
       var margin = {top: 30, right: 300, bottom: 30, left: 60},
           width = 878 - margin.left - margin.right,
           height = 400 - margin.top - margin.bottom;
@@ -357,7 +357,7 @@
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
         .append("g")
-            .attr("transform", 
+            .attr("transform",
                   "translate(" + margin.left + "," + margin.top + ")");
 
       //for barchart
@@ -365,7 +365,7 @@
           .rangeRoundBands([0, widthBar], .2);
 
       var yBar = d3.scale.linear()
-          .domain([0,50])
+          .domain([0,60])
           .range([heightBar, 0]);
 
       //years
@@ -393,10 +393,10 @@
 
       // DATA for salaries by college
       d3.csv('salariesByCollegeAndTuition.csv', function(error, data) {
-        
-        color.domain(d3.keys(data[0]).filter(function(key) { 
+
+        color.domain(d3.keys(data[0]).filter(function(key) {
           if (key !== "Year") {
-            return key; 
+            return key;
           }
         }));
 
@@ -430,17 +430,17 @@
                 'salary': d[college]
               }
             );
-            if (years.indexOf(d.Year) < 0) { 
+            if (years.indexOf(d.Year) < 0) {
               years.push(d.Year);
             }
           });
         });
 
-        timeline.append("g")            
+        timeline.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + height + ")")
             .call(xAxis);
-          
+
         timeline.append("g")
             .attr("class", "y axis")
             .call(yAxis);
@@ -466,7 +466,7 @@
             d3.select(this).classed('active', false);
             // tip.hide(d);
           });
-      
+
 
         //trend line
         var trendLines = timeline.selectAll(".lines")
@@ -521,14 +521,14 @@
         //     d3.select(this).style('fill-opacity',0);
         //     // tip.hide(d);
         //   });
-       
-        // add legend   
+
+        // add legend
         var legend = timeline.append("g")
           .attr("class", "legend")
           .attr("height", 100)
           .attr("width", 100)
-          .attr('transform', 'translate(-20,0)');    
-          
+          .attr('transform', 'translate(-20,0)');
+
           legend.selectAll('circle')
               .data(salaryByCollege)
             .enter()
@@ -537,7 +537,7 @@
               .attr("cy", function(d, i){return i * 20 + 5;})
               .attr("r", 4)
               .style("fill", function(d) { return color(d.college); });
-              
+
           legend.selectAll('text')
               .data(salaryByCollege)
             .enter()
@@ -572,7 +572,7 @@
             var xAxisBar = d3.svg.axis()
               .scale(xBar)
               .orient("bottom")
-              .tickFormat(function(d) { 
+              .tickFormat(function(d) {
                 if (d.match(/\(([^)]+)\)/)) {
                   return d.match(/\(([^)]+)\)/)[1].toString();
                 } else {
@@ -594,7 +594,7 @@
                 return d['Year'] == year;
               });
 
-              var debtByCollege = []; 
+              var debtByCollege = [];
               //college: value,
               //debtInYears: value
 
@@ -613,7 +613,7 @@
 
               var collegeBars = barchart.selectAll(".bar")
                 .data(debtByCollege);
-                
+
               collegeBars.enter().append('rect')
                 .attr("class","bar");
 
@@ -625,16 +625,16 @@
                 .attr("y", function(d) { return yBar(d.debtInYears); })
                 .attr("height", function(d) { return heightBar - yBar(d.debtInYears); })
                 .attr("fill", function(d) { return color(d.college); })
-                .style("fill-opacity", .8);   
+                .style("fill-opacity", .8);
 
 
               var collegeBarsText = barchart.selectAll(".barlabel")
                 .data(debtByCollege);
-                
+
               collegeBarsText.enter().append('text')
                 .attr("class","barlabel");
-              
-              collegeBarsText.transition().duration(2000)             
+
+              collegeBarsText.transition().duration(2000)
                 // .append('text')
                 .attr("dy", "1.5em")
                 .attr("y", function(d) { return yBar(d.debtInYears); })
@@ -644,25 +644,42 @@
 
             }
 
-            //listener 
+            //listener
             $('input[id="slider-percent"]').on('change', updateBarChart);
             //initialize
             updateBarChart();
 
 
-        }); 
+        });
 
       }
 
-      //timeline 
+      //timeline
       createTimeline();
 
-          
+
       function debtInYears(tuition,salary,percent) {
         var temp = (0.0429*tuition)/(percent*salary);
         var years = (-Math.log(1-temp))/(Math.log(1+0.0429));
         return years;
       }
+
+/*
+Loan Year Calculation Explanation:
+
+The number of years it would take to pay back a loan to fund a 4 year undergraduate
+degree at Cornell was calculated by the following formula:
+Annual Payment = (Annual Rate * principal Loan Amount)/1 - (1+annual rate)^-number of years
+The above formula was then solved to find number of years.
+
+The rate was selected based on most recent student loan interest rates from:
+https://studentaid.ed.gov/sa/types/loans/interest-rates#what-is-interest
+
+Please note there are many ways to calculate the number of years and this is the one we selected.
+The reason our slider starts at 20% is the fact that a monthly payment must be as much as if not more
+than the interest due in a month. For example, in 2001, Cornell Tuition was $99,400. To make an
+annual payment of 10% of the starting salary for a CALS graduate that year, the monthly amount would be
+$312.60 which is less than the monthly interest owed ($355.36) */
 
     </script>
 
