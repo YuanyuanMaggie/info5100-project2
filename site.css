@@ -13,6 +13,7 @@ body { font-family: "Open Sans"; }
 .no-top-margin {
   margin-top: 0;
 }
+
 /* charts with axes */
 .axis {
   font-size: .8em;
@@ -101,9 +102,19 @@ li.key {
 
 label {
   font-weight: lighter;
-  font-size: 1.5em;
+  font-size: 1.2em;
   margin-bottom: 0;
   margin-top: 5px;
+  text-align: center;
+}
+
+label #percent {
+  font-size: 1.2em;
+  line-height: 1em;
+}
+label #loan-start-year {
+  font-size: 1.2em;
+  line-height: 1em;
 }
 
 .jumbotron p {

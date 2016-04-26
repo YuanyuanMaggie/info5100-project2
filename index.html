@@ -78,8 +78,9 @@
           <div id="timeline"></div>
         </div>
         <div class="col-lg-3">
-            <input type="hidden" id="year-loan" value='2014'></input>
-            <label id="slider"> Years it'll take to pay back a loan taken to fund a 4 year Cornell degree if one pays <span id="percent">20%</span> of starting salary:</label>
+            <input type="hidden" id="input-year" value='2014'></input>
+            <h4>Years it'll take to pay back a loan taken to fund a 4 year Cornell degree</h4>
+            <label><span id="percent">20%</span> <small>of starting salary paid graduating year</small> <span id="loan-start-year">2014</span></label>
             <input type="range" min="0.2" max="1" value="0.2" id="slider-percent" step="0.01" >
           <div id="barchart"></div>
         </div>
@@ -90,7 +91,7 @@
 
     <script>
 
-    var formatPercent = d3.format('.0%')
+    var formatPercent = d3.format('%')
     var formatCurrency = d3.format("$,.0f");
     var formatIndex = d3.format(".0f");
     var formatRound = d3.format(".0f");
@@ -101,7 +102,7 @@
     });
 
     $('input[id="slider-percent"]').on("input", function() {
-      formatPercent($('#percent').html(this.value));
+      $('#percent').html(formatPercent(this.value));
     });
 
 
@@ -324,7 +325,7 @@
 
       var margin = {top: 30, right: 300, bottom: 30, left: 60},
           width = 878 - margin.left - margin.right,
-          height = 400 - margin.top - margin.bottom;
+          height = 480 - margin.top - margin.bottom;
 
       var marginBar = {top: 30, right: 0, bottom: 30, left: 25},
           widthBar = 292 - marginBar.left - marginBar.right,
@@ -365,7 +366,7 @@
           .rangeRoundBands([0, widthBar], .2);
 
       var yBar = d3.scale.linear()
-          .domain([0,60])
+          .domain([0,70])
           .range([heightBar, 0]);
 
       //years
@@ -457,7 +458,8 @@
           .on("mouseover",function(d){
             d3.select(this).style('fill-opacity',.5);
             d3.select(this).classed('active', true);
-            $('#year-loan').val(d3.select(this).attr("id"));
+            $('#input-year').val(d3.select(this).attr("id"));
+            $('#loan-start-year').html(d3.select(this).attr("id"));
             updateBarChart();
             // tip.show(d);
           })
@@ -527,7 +529,7 @@
           .attr("class", "legend")
           .attr("height", 100)
           .attr("width", 100)
-          .attr('transform', 'translate(-20,0)');
+          .attr('transform', 'translate(-20,200)');
 
           legend.selectAll('circle')
               .data(salaryByCollege)
@@ -588,7 +590,7 @@
             function updateBarChart() {
 
               var rate = $('input[id="slider-percent"]').val();
-              var year = $('#year-loan').val();
+              var year = $('#input-year').val();
 
               dataFilteredByYear = data.filter(function(d) {
                 return d['Year'] == year;
@@ -634,7 +636,7 @@
               collegeBarsText.enter().append('text')
                 .attr("class","barlabel");
 
-              collegeBarsText.transition().duration(2000)
+              collegeBarsText.transition().duration(1000)
                 // .append('text')
                 .attr("dy", "1.5em")
                 .attr("y", function(d) { return yBar(d.debtInYears); })
