@@ -45,7 +45,7 @@
           </div>
         </div>
         <div class="col-lg-1">
-          <label for="slider text-right"><span id="year">Year</span></label>
+            <label for="slider">Year <span id="year">2014</span></label>
         </div>
         <div class="col-lg-4">
           <input type="range" min="2001" max="2014" value="2014" id="slider-year" step="1" >
@@ -79,7 +79,11 @@
         </div>
         <div class="col-lg-3">
             <input type="hidden" id="input-year" value='2014'></input>
-            <h4>Years it'll take to pay back a loan taken to fund a 4 year Cornell degree</h4>
+            <h4>Years it'll take to pay back a loan taken to fund a 4 year Cornell degree
+              <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#loan-more-info">
+                <span class="glyphicon glyphicon-info"></span> more info
+              </button>
+            </h4>
             <label><span id="percent">20%</span> <small>of starting salary paid graduating year</small> <span id="loan-start-year">2014</span></label>
             <input type="range" min="0.2" max="1" value="0.2" id="slider-percent" step="0.01" >
           <div id="barchart"></div>
@@ -88,6 +92,24 @@
       </div>
 
     </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="loan-more-info">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Loan Year Calculation </h4>
+          </div>
+          <div class="modal-body">
+            <p>The number of years it would take to pay back a loan to fund a 4 year undergraduate degree at Cornell was calculated by the following formula: <strong>Annual Payment = (Annual Rate * principal Loan Amount)/1 - (1+annual rate)^-number of years</strong> The formula was then solved to find number of years.</p>
+
+            <p>The rate was selected based on most recent student loan interest rates from: <a href="https://studentaid.ed.gov/sa/types/loans/interest-rates#what-is-interest">https://studentaid.ed.gov</a></p>
+
+            <p>Please note there are many ways to calculate the number of years and this is the one we selected.  The reason our slider starts at 20% is the fact that a monthly payment must be as much as if not more than the interest due in a month. For example, in 2001, Cornell Tuition was $99,400. To make an annual payment of 10% of the starting salary for a CALS graduate that year, the monthly amount would be $312.60 which is less than the monthly interest owed ($355.36).</p>          
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
     <script>
 
@@ -665,23 +687,6 @@
         var years = (-Math.log(1-temp))/(Math.log(1+0.0429));
         return years;
       }
-
-/*
-Loan Year Calculation Explanation:
-
-The number of years it would take to pay back a loan to fund a 4 year undergraduate
-degree at Cornell was calculated by the following formula:
-Annual Payment = (Annual Rate * principal Loan Amount)/1 - (1+annual rate)^-number of years
-The above formula was then solved to find number of years.
-
-The rate was selected based on most recent student loan interest rates from:
-https://studentaid.ed.gov/sa/types/loans/interest-rates#what-is-interest
-
-Please note there are many ways to calculate the number of years and this is the one we selected.
-The reason our slider starts at 20% is the fact that a monthly payment must be as much as if not more
-than the interest due in a month. For example, in 2001, Cornell Tuition was $99,400. To make an
-annual payment of 10% of the starting salary for a CALS graduate that year, the monthly amount would be
-$312.60 which is less than the monthly interest owed ($355.36) */
 
     </script>
 
