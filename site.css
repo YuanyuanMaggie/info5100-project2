@@ -39,33 +39,22 @@ body { font-family: "Open Sans"; }
   fill: #e2e2e2;
 }
 
-.year:ho {
-  fill-opacity:0;
-  fill: #e2e2e2;
-}
-
 .state {
-  shape-rendering: crispedges;
+  fill: #e2e2e2;
+  /*shape-rendering: crispedges;*/
   stroke-width: 1px;
   stroke: white;
 }
-
-
-/*polyline{
-  opacity: .3;
-  stroke: black;
-  stroke-width: 2px;
-  fill: none;
-}*/
 
 .labels text, .label {
   font-size: .8em;
   font-weight: normal;
 }
 
-.bold {
-  font-size: 2em;
-  font-weight: bold;
+.barlabel {
+  font-size: .8em;
+  fill: white;
+  stroke: none;
 }
 
 /* legends for maps */
@@ -80,10 +69,6 @@ li.key {
     width: 10%;
     padding-left: 0;
     padding-right: 0;
-}
-
-#college-details {
-  display: none;
 }
 
 .d3-tip {

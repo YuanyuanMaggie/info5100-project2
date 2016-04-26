@@ -26,14 +26,6 @@
 
   </head>
   <body>
-    <!-- 
-    <div class="jumbotron">
-      <div class="container">
-        <h1>Cornell Graduates Starting Salaries</h1>
-      </div>
-    </div>
-    -->
-
     <div class="container">
 
       <div class="row">
@@ -86,7 +78,7 @@
           <div id="timeline"></div>
         </div>
         <div class="col-lg-3">
-            <input type="hidden" id="year-loan"></input>
+            <input type="hidden" id="year-loan" value='2014'></input>
             <label id="slider">Loan Paid as Percent of Salary  : <span id="percent">20%</span></label>
             <input type="range" min="0.2" max="1" value="0.2" id="slider-percent" step="0.01" >
           <div id="barchart"></div>
@@ -101,6 +93,7 @@
     var formatPercent = d3.format('.0%')
     var formatCurrency = d3.format("$,.0f");
     var formatIndex = d3.format(".0f");
+    var formatRound = d3.format(".0f");
 
     //show year as input changes
     $('input[id="slider-year"]').on("input", function() {
@@ -111,31 +104,6 @@
       formatPercent($('#percent').html(this.value));
     });
 
-
-    // https://bl.ocks.org/mbostock/7555321
-    function wrap(text, width) {
-      text.each(function() {
-        var text = d3.select(this),
-            words = text.text().split(/\s+/).reverse(),
-            word,
-            line = [],
-            lineNumber = 0,
-            lineHeight = 1.1, // ems
-            y = text.attr("y"),
-            dy = parseFloat(text.attr("dy")),
-            tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
-        while (word = words.pop()) {
-          line.push(word);
-          tspan.text(line.join(" "));
-          if (tspan.node().getComputedTextLength() > width) {
-            line.pop();
-            tspan.text(line.join(" "));
-            line = [word];
-            tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
-          }
-        }
-      });
-    }
 
     var maps = 
       [
@@ -286,8 +254,8 @@
               } else {
                 var filteredData = dataByState.get(d.properties.name);
               }
-              
-              if (! filteredData) { return "#fff";}
+      
+              if (! filteredData) { return "#e2e2e2";}
               return colors(filteredData[id + year]);
             })
               .on('mouseover', function(d, i) {
@@ -400,17 +368,11 @@
           .domain([0,50])
           .range([heightBar, 0]);
 
-      //colleges
-      var xAxisBar = d3.svg.axis()
-          .scale(xBar)
-          .orient("bottom");
-
       //years
       var yAxisBar = d3.svg.axis()
           .scale(yBar)
           .orient("left")
           .ticks(5);
-          // .tickFormat(function(d) { return d + "%"; });
 
       var barchart = d3.select("#barchart").append("svg")
           .attr("width", widthBar + marginBar.left + marginBar.right)
@@ -427,6 +389,7 @@
           .attr("dy", ".71em")
           .style("text-anchor", "end")
           .text("Years");
+
 
       // DATA for salaries by college
       d3.csv('salariesByCollegeAndTuition.csv', function(error, data) {
@@ -514,7 +477,7 @@
         trendLines.append("path")
             .attr("class", "trendline")
             .attr("id",function(d){
-              var college = d.college.replace(/ +/g, "");
+              var college = d.college.replace(/ +/g, "").replace(/\(([^)]+)\)/);
               return college})
             .attr("d", function(d) { return line(d.values); })
             .style("stroke", function(d) { return color(d.college); });
@@ -587,36 +550,45 @@
               .text(function(d) { return d.college; })
             .on("mouseover",function(d){
                 d3.select(this).style("font-size","1em");
-                var college = "#"+d.college.replace(/ +/g, "")
-                d3.select(college).style("stroke-width","8px");
+                var college = "#"+d.college.replace(/ +/g, "").replace(/\(([^)]+)\)/);
+                d3.selectAll(college).style("stroke-width","8px");
+                d3.selectAll(college).style("fill-opacity",1);
             })
             .on("mouseout",function(d){
                 d3.select(this).style("font-size","0.8em");
-                var college = "#"+d.college.replace(/ +/g, "")
-                d3.select(college).style("stroke-width","3px");
+                var college = "#"+d.college.replace(/ +/g, "").replace(/\(([^)]+)\)/);
+                d3.selectAll(college).style("stroke-width","3px");
+                d3.selectAll(college).style("fill-opacity",.8);
             });
 
-            //barchart
-            barchart.append("g")
-              .attr("class", "x axis")
-              .attr("transform", "translate(0," + height + ")")
-              .call(xAxisBar)
-            .selectAll(".tick text")
-              .call(wrap, xBar.rangeBand());
 
-            barchart.append("g")
-                .attr("class", "y axis")
-                .call(yAxisBar);
+            //barchart
+
+            //x-axis colleges
 
             color.domain(colleges);
             xBar.domain(colleges);
+
+            var xAxisBar = d3.svg.axis()
+              .scale(xBar)
+              .orient("bottom")
+              .tickFormat(function(d) { 
+                if (d.match(/\(([^)]+)\)/)) {
+                  return d.match(/\(([^)]+)\)/)[1].toString();
+                } else {
+                  return d;
+                }
+              });
+
+            barchart.append("g")
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + heightBar + ")")
+              .call(xAxisBar);
 
             function updateBarChart() {
 
               var rate = $('input[id="slider-percent"]').val();
               var year = $('#year-loan').val();
-
-              console.log('updateBarChart',rate,year);
 
               dataFilteredByYear = data.filter(function(d) {
                 return d['Year'] == year;
@@ -645,13 +617,30 @@
               collegeBars.enter().append('rect')
                 .attr("class","bar");
 
+
               collegeBars.transition().duration(1000)
-                .attr("id",function(d){ return d.college.replace(/ +/g, ""); })
+                .attr("id",function(d){ return d.college.replace(/ +/g, "").replace(/\(([^)]+)\)/); })
                 .attr("x", function(d) { return xBar(d.college); })
                 .attr("width", xBar.rangeBand())
                 .attr("y", function(d) { return yBar(d.debtInYears); })
                 .attr("height", function(d) { return heightBar - yBar(d.debtInYears); })
-                .attr("fill", function(d) { return color(d.college); });
+                .attr("fill", function(d) { return color(d.college); })
+                .style("fill-opacity", .8);   
+
+
+              var collegeBarsText = barchart.selectAll(".barlabel")
+                .data(debtByCollege);
+                
+              collegeBarsText.enter().append('text')
+                .attr("class","barlabel");
+              
+              collegeBarsText.transition().duration(2000)             
+                // .append('text')
+                .attr("dy", "1.5em")
+                .attr("y", function(d) { return yBar(d.debtInYears); })
+                .attr("x", function(d) { return xBar(d.college) +  xBar.rangeBand()/2; })
+                .attr("text-anchor", "middle")
+                .text(function (d) { return formatRound(d.debtInYears); });
 
             }
 
