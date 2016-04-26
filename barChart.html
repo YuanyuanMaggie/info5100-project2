@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bar Chart</title>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+   <link rel="stylesheet" href="site.css">
+   <script
+        src="https://code.jquery.com/jquery-1.12.3.min.js"
+        integrity="sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ="
+        crossorigin="anonymous">
+    </script>
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.6.7/d3-tip.js"></script>
+</head>
+<style type="text/css">
+  .axis {
+        font-size: .8em;
+      }
+      .axis path,
+      .axis line {
+        fill: none;
+        stroke: #000;
+        stroke-width: .5;
+        shape-rendering: crispEdges;
+      }
+
+</style>
+<body>
+<div class="slider-wrap">
+<label id="slider">Pay Rate : <span id="sliderNum">0.2</span></label>
+<input type="range" min="0.2" max="1" value="0.2" id="slider-load" step="0.01" onchange="changeSlider()">
+<div id="barchart">
+</div>
+</div>
+
+<script type="text/javascript">
+  
+  var year = 2014;
+  var rate = $('input[type="range"]').val();
+  drawBars(year);
+  
+
+  function drawBars(year) {
+     var width = 500;
+     var height = 500;
+     var padding = 60;
+
+     var color = d3.scale.category10();
+     var SalaryDic = {};
+     var xBands = d3.scale.ordinal().rangeBands([padding, width-padding], 0.3, 0.1);
+     var yScale = d3.scale.linear().range([height - padding, padding]);
+
+     var xAxis = d3.svg.axis().scale(xBands).orient("bottom");
+
+     var yAxis = d3.svg.axis().scale(yScale)
+            .orient("left").ticks(5).tickFormat(function(d) { return d; });
+
+    d3.selectAll("svg").remove();
+       var svg = d3.select("#barchart").append("svg")
+        .attr("height", height).attr("width", width);
+
+     d3.csv("salariesByCollegeAndTuition.csv",function(error,rows){
+      if(error){
+        console.log(error);
+      }
+      var majors = d3.keys(rows[0]).filter(function(key) {
+            if (key !== "Year" && key!=="Tuition") {
+              return key;
+            }
+          });
+
+      color.domain(majors);
+      xBands.domain(majors);
+      yScale.domain([0,70]);
+
+      rows.forEach(function(row){
+          var SalariesByCollege = {
+            "AgricultureAndLifeSciences":loanYear(row.Tuition, row.AgricultureAndLifeSciences, rate),
+            "ArchitechtureArtAndPlanning": loanYear(row.Tuition, row.ArchitechtureArtAndPlanning,rate),
+            "ArtsAndSciences": loanYear(row.Tuition, row.ArtsAndSciences,rate),
+            "Engineering": loanYear(row.Tuition, row.Engineering,rate),
+            "Hotel": loanYear(row.Tuition, row.Hotel,rate),
+            "HumanEcology": loanYear(row.Tuition, row.HumanEcology,rate),
+            "IndustrialAndLaborRelations": loanYear(row.Tuition, row.IndustrialAndLaborRelations,rate),
+            "Tuition": row.Tuition
+                }
+          // console.log(loanYear(row.Tuition, row.AgricultureAndLifeSciences),0.25);
+           SalaryDic[row.Year]=SalariesByCollege;
+       } );
+     var selectYearLoan = SalaryDic[year];
+     var selectYearArr = [];
+     majors.forEach(function(d){
+      selectYearArr.push([d,selectYearLoan[d]]);
+     })
+
+     svg.append("g")
+              .attr("class", "axis")
+              .attr("transform", "translate(0," + (height-padding) + ")")
+              .call(xAxis);
+
+       svg.append("g")
+              .attr("class", "axis")
+              .attr("transform", "translate(" + padding + ",0)")
+              .call(yAxis);
+
+     var loanBar = svg.selectAll(".bars")
+              .data(selectYearArr)
+            .enter().append("g")
+              .attr("class", "bars");
+      var tip = d3.tip()
+                   .attr('class', 'd3-tip')
+                    .offset([-10, 0])
+                    .html(function(d) {
+                      return "<strong>College :</strong> <span style='color:red'>" + d[0] + "</span><br><strong>Year:</strong> <span style='color:red'>" + d[1] + "</span>";
+                       });
+
+          svg.call(tip);
+
+          loanBar.append("rect")
+              .attr("class", "bar")
+          .attr("x",function(d){
+            return xBands(d[0])})
+          .attr("y",function(d){return yScale(d[1])})
+          .attr("width",xBands.rangeBand())
+          .attr("height",function(d){
+            return  yScale(0)-yScale(d[1])})
+            .style("fill",function(d) {return color(d[0])})
+            .on("mouseover",function(d){
+                tip.show(d);
+              })
+              .on("mouseout",function(d){
+                tip.hide(d);
+              });;
+         });
+
+
+
+       };
+
+   function loanYear(Tuition,salary,percent) {
+
+    var temp = (0.0429*Tuition)/(percent*salary);
+    //var loanYear = -(Math.ln(1-temp)/Math.ln(1.0429));
+    var loanYear = (-Math.log(1-temp))/(Math.log(1+0.0429))
+    return Math.ceil(loanYear);
+   }    
+
+   function changeSlider(){
+    rate = $('input[type="range"]').val();
+    $("#sliderNum").html(rate);
+    drawBars(year);
+   }
+</script>
+</body>
+</html>

@@ -3,7 +3,11 @@
 body { font-family: "Open Sans"; } 
 
 .row {
-  margin-top: 50px;
+  margin-top: 10px;
+}
+
+.bottom-margin {
+  margin-bottom: 80px;
 }
 
 /* charts with axes */
@@ -30,8 +34,19 @@ body { font-family: "Open Sans"; }
   stroke-opacity: .5;
 }
 
+.year {
+  fill-opacity:0;
+  fill: #e2e2e2;
+}
+
+.year:ho {
+  fill-opacity:0;
+  fill: #e2e2e2;
+}
+
 .state {
-  stroke-width: .5px;
+  shape-rendering: crispedges;
+  stroke-width: 1px;
   stroke: white;
 }
 
@@ -93,6 +108,21 @@ li.key {
   left:50%;
   top:95%;
 }
+
+label {
+  font-weight: lighter;
+  font-size: 1.5em;
+  margin-bottom: 0;
+  margin-top: 5px;
+}
+
+.jumbotron p {
+  font-size: 1.2em;
+}
+.jumbotron ul li {
+  font-size: 1.2em;
+}
+
 
 /* input slider */
 /* http://danielstern.ca/range.css/#/ */
