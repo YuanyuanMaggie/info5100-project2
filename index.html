@@ -43,6 +43,7 @@
               <input type="radio" id="radio-focus" name="focus" value="region" autocomplete="off"> Region
             </label>
           </div>
+          <a href="#" data-toggle="modal" data-target="#moreInfo" class="btn btn-success btn-sm">More Info</a>
         </div>
         <div class="col-lg-1">
             <label for="slider">Year <span id="year">2014</span></label>
@@ -69,7 +70,6 @@
       </div>
 
       <div class="row bottom-margin">
-
         <div class="col-lg-12">
           <h2>Cornell Graduates - Starting Salaries By College</h2>
         </div>
@@ -90,7 +90,23 @@
         </div>
 
       </div>
-
+      <div class="row bottom-margin">
+      <div class="col-lg-12">
+          <p>Data Sources:</p>
+          <ul class="source">
+            <li><a href="http://www.career.cornell.edu/resources/surveys/postgraduate.cfm" target="_blank">Cornell Career Service Data</a></li>
+            <li><a href="http://bea.gov/iTable/iTable.cfm?reqid=70&step=1&isuri=1&acrdn=6#reqid=70&step=30&isuri=1&7022=36&7023=0&7033=-1&7024=non-industry&7025=0&7026=xx&7027=2013&7001=336&7028=3&7030=0&7031=0&7040=-1&7083=levels&7029=36&7090=70" target="_blank">Bureau of Economic Analysis</a></li>
+            <li><a href="http://bea.gov/iTable/iTable.cfm?reqid=70&step=1&isuri=1&acrdn=6#reqid=70&step=30&isuri=1&7022=21&7023=0&7024=non-industry&7033=-1&7025=0&7026=xx&7027=-1&7001=421&7028=3&7031=0&7040=-1&7083=levels&7029=21&7090=70" target="_blank">BEA - Salary by State</a></li>
+            <li><a href="https://www.census.gov/hhes/www/income/data/statemedian/index.html" target="_blank">US Census</a></li>
+            <li><a href="http://data.bls.gov/projections/occupationProj" target="_blank">Employment Projections to 2024</a></li>
+            <li><a href="http://www.compare50.org/chart/category/96/sub_category/474/display/481/chart/482/type/4/states/55,57,85,96" target="_blank">Housing Cost</a></li>
+            <li><a href="http://www.collegesimply.com/colleges/new-york/cornell-university/price/" target="_blank">Cornell Undergraduate Tuition (1987-2010)</a>|  <a href="http://www.news.cornell.edu/stories/2011/01/board-approves-tuition-and-fees-2011-12" target="_blank">(2011-2012)</a>| <a href="http://www.news.cornell.edu/stories/2012/01/board-approves-tuition-and-fees-2012-13" target="_blank">(2012-2013)</a>| <a href="http://news.cornell.edu/stories/2013/03/tuition-and-fees-approved-2013-14" target="_blank" >(2013-2014)</a></li>
+            <li><a href="https://studentaid.ed.gov/sa/types/loans/interest-rates#what-is-interest" target="_blank">Interest rate</a></li>
+            <li><a href="https://www.missourieconomy.org/indicators/cost_of_living/index.stm" target="_blank">Cost of Living Index 2015</a></li>
+            <li><a href="http://inflationdata.com/Inflation/Consumer_Price_Index/HistoricalCPI.aspx?reloaded=true" target="_blank">Inflation data used to calculate other years Cost of Living Index</a></li>
+          </ul>
+      </div>
+      </div>
     </div>
 
     <div class="modal fade" tabindex="-1" role="dialog" id="loan-more-info">
@@ -111,6 +127,22 @@
       </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
+    <div class="modal fade" id="moreInfo">
+        <div class="modal-dialog">
+          <div class="modal-content">
+             <div class="modal-header">
+                  <h4 class="modal-title">More Infomation About Data Calculation</h4>
+              </div>
+          <div class="modal-body">
+            <p>How we calculate the data:</p>
+            <p>Whe choose 7 regions because: </p>
+          </div>
+          <div class="modal-footer">
+             <button type="button" class="btn btn-success" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <script>
 
     var formatPercent = d3.format('%')
@@ -300,7 +332,6 @@
                     .style({'fill-opacity':.5});
                 }
 
-                // $('#year').html(year);
                 var list = '';
                 maps.forEach(function (map) {
                   if (map.type == 'cost') {
