@@ -1,6 +1,6 @@
 /* styles */
 
-body { font-family: "Open Sans"; } 
+body { font-family: "Open Sans";} 
 
 .row {
   margin-top: 10px;
@@ -45,8 +45,7 @@ body { font-family: "Open Sans"; }
 
 .state {
   fill: #e2e2e2;
-  /*shape-rendering: crispedges;*/
-  stroke-width: 1px;
+  stroke-width: .5px;
   stroke: white;
 }
 
