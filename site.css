@@ -10,6 +10,9 @@ body { font-family: "Open Sans"; }
   margin-bottom: 80px;
 }
 
+.no-top-margin {
+  margin-top: 0;
+}
 /* charts with axes */
 .axis {
   font-size: .8em;
