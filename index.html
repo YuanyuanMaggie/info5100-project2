@@ -59,7 +59,7 @@
         </div>
         <div class="col-lg-4">
           <div id="details" class="jumbotron">
-            <p id="intro">As graduation approaches, every Cornell senior has an important decision to make: which job to pick. With graduation coming up quickly in May, we thought we could take this opportunity to delve deeper into what Cornell students have received as their starting salaries as they stepped out into the real world. We hope this visualization helps graduating seniors students in their decision making process about potential job opportunities.</p>
+            <p id="intro">As graduation approaches, every Cornell senior has an important decision to make: which job to pick. We hope this visualization helps graduating seniors students in their decision making process about potential job opportunities while keeping key components displayed here in mind.</p>
             <h3 class='no-top-margin'>
               <span id="focus"></span>
               <span id="focus-year" class="pull-right"></span>
@@ -103,7 +103,7 @@
             <li><a href="http://www.collegesimply.com/colleges/new-york/cornell-university/price/" target="_blank">Cornell Undergraduate Tuition (1987-2010)</a>|  <a href="http://www.news.cornell.edu/stories/2011/01/board-approves-tuition-and-fees-2011-12" target="_blank">(2011-2012)</a>| <a href="http://www.news.cornell.edu/stories/2012/01/board-approves-tuition-and-fees-2012-13" target="_blank">(2012-2013)</a>| <a href="http://news.cornell.edu/stories/2013/03/tuition-and-fees-approved-2013-14" target="_blank" >(2013-2014)</a></li>
             <li><a href="https://studentaid.ed.gov/sa/types/loans/interest-rates#what-is-interest" target="_blank">Interest rate</a></li>
             <li><a href="https://www.missourieconomy.org/indicators/cost_of_living/index.stm" target="_blank">Cost of Living Index 2015</a></li>
-            <li><a href="http://inflationdata.com/Inflation/Consumer_Price_Index/HistoricalCPI.aspx?reloaded=true" target="_blank">Inflation data used to calculate other years Cost of Living Index</a></li>
+            <li><a href="http://inflationdata.com/Inflation/Consumer_Price_Index/HistoricalCPI.aspx?reloaded=true" target="_blank">Inflation data used to calculate Cost of Living Index for 2001-2014</a></li>
           </ul>
       </div>
       </div>
@@ -117,11 +117,11 @@
             <h4 class="modal-title">Loan Year Calculation </h4>
           </div>
           <div class="modal-body">
-            <p>The number of years it would take to pay back a loan to fund a 4 year undergraduate degree at Cornell was calculated by the following formula: <strong>Annual Payment = (Annual Rate * Principal Loan Amount)/1 - (1+Annual Rate)^-Number of Years</strong>. This formula was used to solve for number of years.</p>
+            <p>The number of years it would take to pay back a loan to fund a 4 year undergraduate degree at Cornell was calculated by the following formula: <strong> Annual Payment = (Annual Rate * Principal Loan Amount)/1 - (1+Annual Rate)^-Number of Years. </strong> This formula was used to solve for number of years.</p>
 
             <p>The interest rate of 4.29% was selected based on most recent student loan interest rates from: <a href="https://studentaid.ed.gov/sa/types/loans/interest-rates#what-is-interest">https://studentaid.ed.gov</a>.</p>
 
-            <p>Please note there are many ways to calculate the number of years and this is the one we selected.  The reason our slider starts at 20% is the fact that a monthly payment must be as much as if not more than the interest due in a month. For example, in 2001, Cornell Tuition was $99,400. To make an annual payment of 10% of the starting salary for a CALS graduate that year, the monthly amount would be $312.60 which is less than the monthly interest owed ($355.36).</p>          
+            <p>Please note there are many ways to calculate the number of years and this is the one we selected.  The reason our slider starts at 20% is the fact that a monthly payment must be as much as if not more than the interest due in a month. For example, in 2001, Cornell Tuition was $99,400. To make an annual payment of 10% of the starting salary for a CALS graduate that year, the monthly amount would be $312.60 which is less than the monthly interest owed ($355.36).</p>
           </div>
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->
@@ -131,11 +131,10 @@
         <div class="modal-dialog">
           <div class="modal-content">
              <div class="modal-header">
-                  <h4 class="modal-title">More Infomation About Data Calculation</h4>
+                  <h4 class="modal-title">Wondering how we chose these 7 regions?</h4>
               </div>
           <div class="modal-body">
-            <p>How we calculate the data:</p>
-            <p>Whe choose 7 regions because: </p>
+            <p>We choose 7 regions because Cornell's Career Service Starting salary has these regions defined in their post graduate reports. </p>
           </div>
           <div class="modal-footer">
              <button type="button" class="btn btn-success" data-dismiss="modal">Close</button>
@@ -512,7 +511,7 @@
                   html += '<li><strong>' +  d[key] + '</strong></li>'
                 } else {
                   html += '<li>' + key + ": <span style='color:red'>" + formatCurrency(d[key]) + "</span></li>";
-                } 
+                }
               }
             }
             html += '</ul>'
